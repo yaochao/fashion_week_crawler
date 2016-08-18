@@ -90,10 +90,9 @@ class VoguespiderSpider(CrawlSpider):
         type = ''
         if len(type_sel) != 0:
             type_1 = type_sel[0] # '2016秋冬高级成衣/高级定制/婚纱发布秀'
-            re_type = r'^(20\d{2})(.*)(高级成衣|高级定制|婚纱)发布秀$'.decode('utf-8')
-            rests = re.findall(re_type, type_1)
+            re_type = r'^(20\d{2})(.*)(高级成衣|高级定制|婚纱)发布秀$'
+            rests = re.findall(re_type, type_1.encode('utf-8'))
             type = rests[0][2]
-            print rests, type
 
         # 提取评论
         comment_sel = selector.xpath('//div[@class="content"]/div[@class="section xcl-text"]/div[@class="txt"]/text()').extract()
