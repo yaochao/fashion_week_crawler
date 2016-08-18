@@ -62,7 +62,7 @@ class MySQLStoreVoguePipeline(object):
         cursor.execute('select * from vogue where md5 = "%s"', (item['md5'],))
         ret = cursor.fetchone()
         if ret:
-            return
+            print 'item already exists in db'
         else:
             cursor.execute('insert into vogue(name, brand, md5, url, comment, city, year, season, type) values(%s, %s, %s, %s, %s, %s, %s, %s, %s)', (item['name'], item['brand'], item['md5'], item['url'], item['comment'], item['city'], item['year'], item['season'], item['type']))
 
