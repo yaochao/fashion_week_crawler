@@ -95,8 +95,6 @@ class VoguespiderSpider(CrawlSpider):
             type = rests[0][2]
             print rests, type
 
-
-
         # 提取评论
         comment_sel = selector.xpath('//div[@class="content"]/div[@class="section xcl-text"]/div[@class="txt"]/text()').extract()
         comment = ''

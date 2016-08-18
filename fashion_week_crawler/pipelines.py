@@ -14,8 +14,8 @@ from scrapy.exceptions import DropItem
 import os
 
 # BASE_PATH
-# BASE_PATH = '/data/datapark/yaochao/download/vogue/'
-BASE_PATH = '/Users/yaochao/Desktop/vogue/'
+BASE_PATH = '/data/datapark/yaochao/download/vogue/'
+# BASE_PATH = '/Users/yaochao/Desktop/vogue/'
 
 
 # 示例 Pipeline
@@ -74,26 +74,17 @@ class MySQLStoreVoguePipeline(object):
 
 
 # 检测图片是否存在的Pipeline
-class ImagesExistsPipeline(object):
+class DuplicatesPipeline(object):
 
     # 做为Pipeline, scrapy会自动调用此方法
     def process_item(self, item, spider):
-        rst = self.file_is_exists(item)
-        if rst:
-            raise DropItem("图片已经存在本地目录")
-        else:
-            return item
-
-    def file_is_exists(self, item):
         filename = item['md5'] + '.jpg'
         filepath = BASE_PATH + filename
         print 'filepath', filepath
         if os.path.exists(filepath):
-            print '图片已经存在'
-            return True
+            raise DropItem("Image already exists")
         else:
-            print '图片不存在'
-            return False
+            return item
 
 
 # 保存图片 Pipeline ,优先级:300
