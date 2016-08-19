@@ -12,6 +12,7 @@ class VoguespiderSpider(CrawlSpider):
     start_urls = (
         'http://shows.vogue.com.cn/all.html',
     )
+
     # 自定义设置
     # custom_settings = {
     #     'CONCURRENT_REQUESTS_PER_DOMAIN': 2,
@@ -22,13 +23,13 @@ class VoguespiderSpider(CrawlSpider):
         selector = Selector(response)
         namelists = selector.xpath('//div[@class="nameList"]')
         for namelist in namelists:
-             brands = namelist.xpath('ul/li')
-             for brand in brands:
-                 name = brand.xpath('a/text()').extract()
-                 url = brand.xpath('a/@href').extract()
-                 fashion_brand_item['name'] = name[0]
-                 fashion_brand_item['url'] = url[0]
-                 yield scrapy.Request(url=url[0], callback=self.parse_brand_detail_list)
+            brands = namelist.xpath('ul/li')
+            for brand in brands:
+                name = brand.xpath('a/text()').extract()
+                url = brand.xpath('a/@href').extract()
+                fashion_brand_item['name'] = name[0]
+                fashion_brand_item['url'] = url[0]
+                yield scrapy.Request(url=url[0], callback=self.parse_brand_detail_list)
 
     def parse_brand_detail_list(self, response):
         fashion_brand_list_item = FashionBrandListItem()
@@ -40,7 +41,7 @@ class VoguespiderSpider(CrawlSpider):
             fashion_brand_list_item['name'] = name[0]
             fashion_brand_list_item['url'] = url[0]
             with open('allfashionshow.txt', 'a') as f:
-                f.write(url[0]+'\n')
+                f.write(url[0] + '\n')
             yield scrapy.Request(url=url[0], callback=self.parse_fashion_show_detail)
 
         # 下一页链接的处理
@@ -49,7 +50,6 @@ class VoguespiderSpider(CrawlSpider):
         if rst:
             next_link = rst[0].split('href=\'')[-1]
             yield scrapy.Request(url=next_link, callback=self.parse_brand_detail_list)
-
 
     def parse_fashion_show_detail(self, response):
         fashion_show_item = FashionShowItem()
@@ -68,16 +68,8 @@ class VoguespiderSpider(CrawlSpider):
         city = ''
         year = ''
         season = ''
-        if len(city_list) !=0:
-            city_1 = city_list[0] # '2016巴黎秋冬时装发布'
-            # city_2 = city_1[4:]   # '巴黎秋冬时装发布'
-            # position = len(city_2) - 6 # 一共6个汉字(春夏/秋冬时装发布) ,6*3=18
-            # city = city_2[0:position] # '巴黎'
-            #
-            # year = city_1[0:4] # '2016'
-            #
-            # position2 = len(city_2) - 4 # 一共6个汉字(时装发布) ,4*3=18
-            # season = city_2[position2-2:position2]
+        if len(city_list) != 0:
+            city_1 = city_list[0]  # '2016巴黎秋冬时装发布'
 
             re_a = r'^(20\d{2})(.*)(春夏|秋冬)(时装|婚纱)发布$'.decode('utf-8')
             rests = re.findall(re_a, city_1)
@@ -89,15 +81,16 @@ class VoguespiderSpider(CrawlSpider):
         type_sel = selector.xpath('//*[@id="main"]/div[2]/div[1]/p[2]/a[1]/text()').extract()
         type = ''
         if len(type_sel) != 0:
-            type_1 = type_sel[0] # '2016秋冬高级成衣/高级定制/婚纱发布秀'
+            type_1 = type_sel[0]  # '2016秋冬高级成衣/高级定制/婚纱发布秀'
             re_type = r'^(20\d{2})(.*)(高级成衣|高级定制|婚纱)发布秀$'
             rests = re.findall(re_type, type_1.encode('utf-8'))
             type = rests[0][2]
 
         # 提取评论
-        comment_sel = selector.xpath('//div[@class="content"]/div[@class="section xcl-text"]/div[@class="txt"]/text()').extract()
+        comment_sel = selector.xpath(
+            '//div[@class="content"]/div[@class="section xcl-text"]/div[@class="txt"]/text()').extract()
         comment = ''
-        if len(comment_sel) !=0:
+        if len(comment_sel) != 0:
             for comm in comment_sel:
                 if comm.strip() != '':
                     comment = comment + comm.strip() + ','
@@ -112,15 +105,15 @@ class VoguespiderSpider(CrawlSpider):
             name = img_title + url_sp[1]
             fashion_show_item['name'] = name
             fashion_show_item['url'] = url
-            fashion_show_item['md5'] = md5
             fashion_show_item['brand'] = brand
+            fashion_show_item['md5'] = md5
             fashion_show_item['comment'] = comment
             fashion_show_item['city'] = city
             fashion_show_item['year'] = year
             fashion_show_item['type'] = type
             fashion_show_item['season'] = season
-            with open('allimage.txt', 'a') as f:
-                f.write(fashion_show_item['md5']+'.jpg\n')
+            with open('allimageurl.txt', 'a') as f:
+                f.write(fashion_show_item['url'] + '\n')
             yield fashion_show_item
 
     def md5(self, str):
