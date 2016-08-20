@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from scrapy.spiders import CrawlSpider
 from fashion_week_crawler.items import FashionBrandItem, FashionBrandListItem, FashionShowItem
-from scrapy.selector import Selector
 import scrapy
 import hashlib
 import re
@@ -20,8 +19,7 @@ class VoguespiderSpider(CrawlSpider):
 
     def parse(self, response):
         fashion_brand_item = FashionBrandItem()
-        selector = Selector(response)
-        namelists = selector.xpath('//div[@class="nameList"]')
+        namelists = response.xpath('//div[@class="nameList"]')
         for namelist in namelists:
             brands = namelist.xpath('ul/li')
             for brand in brands:
@@ -33,8 +31,7 @@ class VoguespiderSpider(CrawlSpider):
 
     def parse_brand_detail_list(self, response):
         fashion_brand_list_item = FashionBrandListItem()
-        selector = Selector(response)
-        fashion_shows = selector.xpath('//div[@class="xcl-p6"]')
+        fashion_shows = response.xpath('//div[@class="xcl-p6"]')
         for fashion_show in fashion_shows:
             name = fashion_show.xpath('div/h2/text()').extract()
             url = fashion_show.xpath('div/p/a/@href').extract()
@@ -53,8 +50,7 @@ class VoguespiderSpider(CrawlSpider):
 
     def parse_fashion_show_detail(self, response):
         fashion_show_item = FashionShowItem()
-        selector = Selector(response)
-        title = selector.xpath('//div[@class="xc-list-tt"]/h1/a/text()').extract()
+        title = response.xpath('//div[@class="xc-list-tt"]/h1/a/text()').extract()
         if len(title) == 0:
             print '页面不存在%s' % response.url
             return
@@ -64,7 +60,7 @@ class VoguespiderSpider(CrawlSpider):
         img_title = '20' + title_sp[1]
 
         # 提取city, year, season
-        city_list = selector.xpath('//*[@id="main"]/div[2]/div[1]/p[2]/a[2]/text()').extract()
+        city_list = response.xpath('//*[@id="main"]/div[2]/div[1]/p[2]/a[2]/text()').extract()
         city = ''
         year = ''
         season = ''
@@ -78,7 +74,7 @@ class VoguespiderSpider(CrawlSpider):
             season = rests[0][2]
 
         # 提取 type: 高级成衣 高级定制 婚纱
-        type_sel = selector.xpath('//*[@id="main"]/div[2]/div[1]/p[2]/a[1]/text()').extract()
+        type_sel = response.xpath('//*[@id="main"]/div[2]/div[1]/p[2]/a[1]/text()').extract()
         type = ''
         if len(type_sel) != 0:
             type_1 = type_sel[0]  # '2016秋冬高级成衣/高级定制/婚纱发布秀'
@@ -87,7 +83,7 @@ class VoguespiderSpider(CrawlSpider):
             type = rests[0][2]
 
         # 提取评论
-        comment_sel = selector.xpath(
+        comment_sel = response.xpath(
             '//div[@class="content"]/div[@class="section xcl-text"]/div[@class="txt"]/text()').extract()
         comment = ''
         if len(comment_sel) != 0:
@@ -96,7 +92,7 @@ class VoguespiderSpider(CrawlSpider):
                     comment = comment + comm.strip() + ','
 
         # 提取图片
-        photos = selector.xpath('//ul[@class="bd"]/li[@class="item"]')
+        photos = response.xpath('//ul[@class="bd"]/li[@class="item"]')
         for photo in photos:
             url = photo.xpath('img/@crs').extract()[0]
             url_sp = url.split('#')
