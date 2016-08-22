@@ -4,6 +4,7 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
+import hashlib
 
 import MySQLdb
 import MySQLdb.cursors
@@ -15,8 +16,8 @@ import os
 from scrapy.utils.project import get_project_settings
 
 # BASE_PATH
-BASE_PATH = '/data/datapark/yaochao/download/vogue/'
-# BASE_PATH = '/Users/yaochao/Desktop/vogue/'
+# BASE_PATH = '/data/datapark/yaochao/download/vogue/'
+BASE_PATH = '/Users/yaochao/Desktop/vogue/'
 
 # settings.py
 settings = get_project_settings()
@@ -63,7 +64,8 @@ class MySQLStoreVoguePipeline(object):
         else:
             cursor.execute(
                 'insert into vogue(name, brand, md5, url, comment, city, year, season, type) values(%s, %s, %s, %s, %s, %s, %s, %s, %s)',
-                (item['name'], item['brand'], item['md5'], item['url'], item['comment'], item['city'], item['year'],
+                (item['name'], item['brand'], item['md5'], item['image_urls'][0], item['comment'], item['city'],
+                 item['year'],
                  item['season'], item['type']))
 
     # 错误处理
@@ -95,10 +97,16 @@ class SaveImagesPipeline(ImagesPipeline):
         if not image_paths:
             raise DropItem("Item contains no images")
         item['image_paths'] = image_paths
-
-        # 给图片重命名(假设只有一张图片)
-        filename = item['md5'] + '.jpg'
-        filepath = BASE_PATH + filename
-        os.rename(BASE_PATH + image_paths[0], filepath)
-
         return item
+
+    def file_path(self, request, response=None, info=None):
+        if not isinstance(request, Request):
+            url = request
+        else:
+            url = request.url
+        return self.md5(url) + '.jpg'
+
+    def md5(self, str):
+        m = hashlib.md5()
+        m.update(str)
+        return m.hexdigest()

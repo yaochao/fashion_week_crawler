@@ -78,8 +78,8 @@ class VoguespiderSpider(CrawlSpider):
         type = ''
         if len(type_sel) != 0:
             type_1 = type_sel[0]  # '2016秋冬高级成衣/高级定制/婚纱发布秀'
-            re_type = r'^(20\d{2})(.*)(高级成衣|高级定制|婚纱)发布秀$'
-            rests = re.findall(re_type, type_1.encode('utf-8'))
+            re_type = r'^(20\d{2})(.*)(高级成衣|高级定制|婚纱)发布秀$'.decode('utf-8')
+            rests = re.findall(re_type, type_1)
             type = rests[0][2]
 
         # 提取评论
@@ -111,7 +111,7 @@ class VoguespiderSpider(CrawlSpider):
             fashion_show_item['type'] = type
             fashion_show_item['season'] = season
             with open('allimageurl.txt', 'a') as f:
-                f.write(fashion_show_item['url'] + '\n')
+                f.write(fashion_show_item['image_urls'][0] + '\n')
             yield fashion_show_item
 
     def md5(self, str):

@@ -27,7 +27,6 @@ class FashionShowItem(scrapy.Item):
     url = scrapy.Field()
     brand = scrapy.Field()
     image_urls = scrapy.Field()
-    images = scrapy.Field()
     image_paths = scrapy.Field()
     comment = scrapy.Field()
     city = scrapy.Field()
