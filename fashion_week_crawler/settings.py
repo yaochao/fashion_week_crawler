@@ -25,8 +25,8 @@ NEWSPIDER_MODULE = 'fashion_week_crawler.spiders'
 MYSQL_HOST = '127.0.0.1'
 MYSQL_DBNAME = 'fashionshow'
 MYSQL_USER = 'root'
-MYSQL_PASSWD = ''
-# MYSQL_PASSWD = '7Rgag9o868YigP2E'
+# MYSQL_PASSWD = ''
+MYSQL_PASSWD = '7Rgag9o868YigP2E'
 # end of MySQL database configure setting
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
@@ -120,5 +120,5 @@ USER_AGENTS = [
 ]
 
 # save file to path:
-IMAGES_STORE = '/Users/yaochao/Desktop/vogue/'
-# IMAGES_STORE = '/data/datapark/yaochao/download/vogue/'
+# IMAGES_STORE = '/Users/yaochao/Desktop/vogue/'
+IMAGES_STORE = '/data/datapark/yaochao/download/vogue/'

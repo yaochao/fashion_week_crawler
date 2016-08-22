@@ -16,8 +16,8 @@ import os
 from scrapy.utils.project import get_project_settings
 
 # BASE_PATH
-# BASE_PATH = '/data/datapark/yaochao/download/vogue/'
-BASE_PATH = '/Users/yaochao/Desktop/vogue/'
+BASE_PATH = '/data/datapark/yaochao/download/vogue/'
+# BASE_PATH = '/Users/yaochao/Desktop/vogue/'
 
 # settings.py
 settings = get_project_settings()
