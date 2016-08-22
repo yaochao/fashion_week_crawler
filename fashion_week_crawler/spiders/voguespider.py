@@ -97,10 +97,12 @@ class VoguespiderSpider(CrawlSpider):
             url = photo.xpath('img/@crs').extract()[0]
             url_sp = url.split('#')
             url = url_sp[0]
+            image_urls = []
+            image_urls.append(url)
             md5 = self.md5(url)
             name = img_title + url_sp[1]
             fashion_show_item['name'] = name
-            fashion_show_item['url'] = url
+            fashion_show_item['image_urls'] = image_urls
             fashion_show_item['brand'] = brand
             fashion_show_item['md5'] = md5
             fashion_show_item['comment'] = comment

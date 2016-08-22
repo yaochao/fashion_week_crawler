@@ -87,14 +87,18 @@ class DuplicatesPipeline(object):
 # 保存图片 Pipeline ,优先级:300
 class SaveImagesPipeline(ImagesPipeline):
     def get_media_requests(self, item, info):
-        yield Request(item['url'])
+        for image_url in item['image_urls']:
+            yield Request(image_url)
 
     def item_completed(self, results, item, info):
         image_paths = [x['path'] for ok, x in results if ok]
         if not image_paths:
             raise DropItem("Item contains no images")
         item['image_paths'] = image_paths
+
+        # 给图片重命名(假设只有一张图片)
         filename = item['md5'] + '.jpg'
         filepath = BASE_PATH + filename
-        os.rename(BASE_PATH + image_paths[0], filepath)  # 给图片重命名
+        os.rename(BASE_PATH + image_paths[0], filepath)
+
         return item
