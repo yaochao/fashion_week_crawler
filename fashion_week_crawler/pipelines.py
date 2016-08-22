@@ -12,10 +12,14 @@ from twisted.enterprise import adbapi
 from scrapy.pipelines.images import ImagesPipeline
 from scrapy.exceptions import DropItem
 import os
+from scrapy.utils.project import get_project_settings
 
 # BASE_PATH
 BASE_PATH = '/data/datapark/yaochao/download/vogue/'
 # BASE_PATH = '/Users/yaochao/Desktop/vogue/'
+
+# settings.py
+settings = get_project_settings()
 
 
 # 示例 Pipeline
@@ -26,24 +30,17 @@ class FashionWeekCrawlerPipeline(object):
 
 # 存储信息到 MySQL 的 Pipeline, 优先级:1
 class MySQLStoreVoguePipeline(object):
-
-    def __init__(self, dbpool):
-        self.dbpool = dbpool
-
-    # 扩展的方法
-    @classmethod
-    def from_crawler(cls, crawler):
+    def __init__(self):
         dbargs = dict(
-            host=crawler.settings['MYSQL_HOST'],
-            db=crawler.settings['MYSQL_DBNAME'],
-            user=crawler.settings['MYSQL_USER'],
-            passwd=crawler.settings['MYSQL_PASSWD'],
+            host=settings['MYSQL_HOST'],
+            db=settings['MYSQL_DBNAME'],
+            user=settings['MYSQL_USER'],
+            passwd=settings['MYSQL_PASSWD'],
             charset='utf8',
             cursorclass=MySQLdb.cursors.DictCursor,
             use_unicode=True,
         )
-        dbpool = adbapi.ConnectionPool('MySQLdb', **dbargs)
-        return cls(dbpool)
+        self.dbpool = adbapi.ConnectionPool('MySQLdb', **dbargs)
 
     def open_spider(self, spider):
         pass
@@ -64,23 +61,23 @@ class MySQLStoreVoguePipeline(object):
         if ret:
             print 'item already exists in db'
         else:
-            cursor.execute('insert into vogue(name, brand, md5, url, comment, city, year, season, type) values(%s, %s, %s, %s, %s, %s, %s, %s, %s)', (item['name'], item['brand'], item['md5'], item['url'], item['comment'], item['city'], item['year'], item['season'], item['type']))
+            cursor.execute(
+                'insert into vogue(name, brand, md5, url, comment, city, year, season, type) values(%s, %s, %s, %s, %s, %s, %s, %s, %s)',
+                (item['name'], item['brand'], item['md5'], item['url'], item['comment'], item['city'], item['year'],
+                 item['season'], item['type']))
 
-    #错误处理
+    # 错误处理
     def _handle_error(self, failue, item, spider):
         with open('pipelines_error.txt', 'a') as f:
             f.write('pipeline failue %s\n url:%s\n' % (failue, item['url']))
 
 
-
 # 检测图片是否存在的Pipeline
 class DuplicatesPipeline(object):
-
     # 做为Pipeline, scrapy会自动调用此方法
     def process_item(self, item, spider):
         filename = item['md5'] + '.jpg'
         filepath = BASE_PATH + filename
-        print 'filepath', filepath
         if os.path.exists(filepath):
             raise DropItem("Image already exists")
         else:
@@ -89,7 +86,6 @@ class DuplicatesPipeline(object):
 
 # 保存图片 Pipeline ,优先级:300
 class SaveImagesPipeline(ImagesPipeline):
-
     def get_media_requests(self, item, info):
         yield Request(item['url'])
 
@@ -100,5 +96,5 @@ class SaveImagesPipeline(ImagesPipeline):
         item['image_paths'] = image_paths
         filename = item['md5'] + '.jpg'
         filepath = BASE_PATH + filename
-        os.rename(BASE_PATH + image_paths[0], filepath) # 给图片重命名
+        os.rename(BASE_PATH + image_paths[0], filepath)  # 给图片重命名
         return item
