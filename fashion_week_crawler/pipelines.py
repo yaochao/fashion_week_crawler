@@ -16,8 +16,9 @@ import os
 from scrapy.utils.project import get_project_settings
 
 # BASE_PATH
-BASE_PATH = '/data/datapark/yaochao/download/vogue/'
+# BASE_PATH = '/data/datapark/yaochao/download/vogue/'
 # BASE_PATH = '/Users/yaochao/Desktop/vogue/'
+BASE_PATH = '/home/yaochao/download/vogue/'
 
 # settings.py
 settings = get_project_settings()
@@ -57,7 +58,7 @@ class MySQLStoreVoguePipeline(object):
 
     # 更新或者写入
     def _do_upinsert(self, cursor, item, spider):
-        cursor.execute('select * from vogue where md5 = "%s"', (item['md5'],))
+        cursor.execute('select * from vogue where md5 = "%s"', (item['md5'],)) # redis
         ret = cursor.fetchone()
         if ret:
             print 'item already exists in db'

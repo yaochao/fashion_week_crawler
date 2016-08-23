@@ -26,7 +26,8 @@ MYSQL_HOST = '127.0.0.1'
 MYSQL_DBNAME = 'fashionshow'
 MYSQL_USER = 'root'
 # MYSQL_PASSWD = ''
-MYSQL_PASSWD = '7Rgag9o868YigP2E'
+# MYSQL_PASSWD = '7Rgag9o868YigP2E'
+MYSQL_PASSWD = 'toor'
 # end of MySQL database configure setting
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
@@ -82,9 +83,9 @@ ITEM_PIPELINES = {
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
 AUTOTHROTTLE_ENABLED = True
 # The initial download delay
-# AUTOTHROTTLE_START_DELAY = 5
+AUTOTHROTTLE_START_DELAY = 1
 # The maximum download delay to be set in case of high latencies
-# AUTOTHROTTLE_MAX_DELAY = 60
+AUTOTHROTTLE_MAX_DELAY = 60
 # The average number of requests Scrapy should be sending in parallel to
 # each remote server
 #AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
@@ -121,4 +122,5 @@ USER_AGENTS = [
 
 # save file to path:
 # IMAGES_STORE = '/Users/yaochao/Desktop/vogue/'
-IMAGES_STORE = '/data/datapark/yaochao/download/vogue/'
+# IMAGES_STORE = '/data/datapark/yaochao/download/vogue/'
+IMAGES_STORE = '/home/yaochao/download/vogue/'
