@@ -12,7 +12,8 @@ class VoguespiderSpider(CrawlSpider):
         'http://shows.vogue.com.cn/all.html',
     )
 
-    # 自定义设置
+    # 自定义设置,会覆盖项目级别的settings
+    # 必须定义为class属性
     # custom_settings = {
     #     'CONCURRENT_REQUESTS_PER_DOMAIN': 2,
     # }
