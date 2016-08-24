@@ -87,7 +87,10 @@ class DuplicatesItemPipeline(object):
 # 存储到Mongodb
 class MongodbStorePipeline(object):
     def __init__(self):
-        self.client = pymongo.MongoClient()
+        self.client = pymongo.MongoClient(
+            settings['MONGO_HOST'],
+            settings['MONGO_PORT']
+        )
         self.db = self.client[settings['MONGO_DB']]
         self.collection = self.db[settings['MONGO_COLLECTION']]
 
@@ -98,7 +101,7 @@ class MongodbStorePipeline(object):
             raise DropItem('md5 already in db')
         else:
             self.collection.insert(dict(item))
-            return item
+        return item
 
 
 # 检测图片是否存在
