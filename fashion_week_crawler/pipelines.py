@@ -8,17 +8,13 @@ import hashlib
 
 import MySQLdb
 import MySQLdb.cursors
+import pymongo
 from scrapy.http import Request
 from twisted.enterprise import adbapi
 from scrapy.pipelines.images import ImagesPipeline
 from scrapy.exceptions import DropItem
 import os
 from scrapy.utils.project import get_project_settings
-
-# BASE_PATH
-# BASE_PATH = '/data/datapark/yaochao/download/vogue/'
-# BASE_PATH = '/Users/yaochao/Desktop/vogue/'
-BASE_PATH = '/home/yaochao/download/vogue/'
 
 # settings.py
 settings = get_project_settings()
@@ -30,7 +26,7 @@ class FashionWeekCrawlerPipeline(object):
         return item
 
 
-# 存储信息到 MySQL 的 Pipeline, 优先级:1
+# 存储信息到 MySQL 的 Pipeline
 class MySQLStoreVoguePipeline(object):
     def __init__(self):
         dbargs = dict(
@@ -58,7 +54,7 @@ class MySQLStoreVoguePipeline(object):
 
     # 更新或者写入
     def _do_upinsert(self, cursor, item, spider):
-        cursor.execute('select * from vogue where md5 = "%s"', (item['md5'],)) # redis
+        cursor.execute('select * from vogue where md5 = "%s"', (item['md5'],))  # redis
         ret = cursor.fetchone()
         if ret:
             print 'item already exists in db'
@@ -75,12 +71,42 @@ class MySQLStoreVoguePipeline(object):
             f.write('pipeline failue %s\n url:%s\n' % (failue, item['url']))
 
 
-# 检测图片是否存在的Pipeline
-class DuplicatesPipeline(object):
+# 去重Item的Pipeline
+class DuplicatesItemPipeline(object):
+    def __init__(self):
+        self.seen = set()
+
+    def process_item(self, item, spider):
+        if item['md5'] in self.seen:
+            raise DropItem('Duplicate item found')
+        else:
+            self.seen.add(item['md5'])
+            return item
+
+
+# 存储到Mongodb
+class MongodbStorePipeline(object):
+    def __init__(self):
+        self.client = pymongo.MongoClient()
+        self.db = self.client[settings['MONGO_DB']]
+        self.collection = self.db[settings['MONGO_COLLECTION']]
+
+    def process_item(self, item, spider):
+        # 数据库去重
+        count = self.collection.find({'md5': item['md5']}).count()
+        if count:
+            raise DropItem('md5 already in db')
+        else:
+            self.collection.insert(dict(item))
+            return item
+
+
+# 检测图片是否存在
+class DuplicatesImagePipeline(object):
     # 做为Pipeline, scrapy会自动调用此方法
     def process_item(self, item, spider):
         filename = item['md5'] + '.jpg'
-        filepath = BASE_PATH + filename
+        filepath = settings['IMAGES_STORE'] + filename
         if os.path.exists(filepath):
             raise DropItem("Image already exists")
         else:

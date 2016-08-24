@@ -22,13 +22,18 @@ NEWSPIDER_MODULE = 'fashion_week_crawler.spiders'
 # ROBOTSTXT_OBEY = True
 
 # start MySQL database configure setting
-MYSQL_HOST = '127.0.0.1'
-MYSQL_DBNAME = 'fashionshow'
-MYSQL_USER = 'root'
+# MYSQL_HOST = '127.0.0.1'
+# MYSQL_DBNAME = 'fashionshow'
+# MYSQL_USER = 'root'
 # MYSQL_PASSWD = ''
 # MYSQL_PASSWD = '7Rgag9o868YigP2E'
-MYSQL_PASSWD = 'toor'
+# MYSQL_PASSWD = 'toor'
 # end of MySQL database configure setting
+
+# Mongodb database configure setting
+MONGO_HOST = '127.0.0.1'
+MONGO_DB = 'fashionshow'
+MONGO_COLLECTION = 'vogue'
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -74,8 +79,9 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'fashion_week_crawler.pipelines.MySQLStoreVoguePipeline': 100,
-    'fashion_week_crawler.pipelines.DuplicatesPipeline': 200,
+    'fashion_week_crawler.pipelines.DuplicatesItemPipeline':1,
+    'fashion_week_crawler.pipelines.MongodbStorePipeline': 100,
+    'fashion_week_crawler.pipelines.DuplicatesImagePipeline': 200,
     'fashion_week_crawler.pipelines.SaveImagesPipeline': 300,
 }
 
@@ -121,6 +127,6 @@ USER_AGENTS = [
 ]
 
 # save file to path:
-# IMAGES_STORE = '/Users/yaochao/Desktop/vogue/'
+IMAGES_STORE = '/Users/yaochao/Desktop/vogue/'
 # IMAGES_STORE = '/data/datapark/yaochao/download/vogue/'
-IMAGES_STORE = '/home/yaochao/download/vogue/'
+# IMAGES_STORE = '/home/yaochao/download/vogue/'
