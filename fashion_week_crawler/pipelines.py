@@ -6,8 +6,8 @@
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import hashlib
 
-import MySQLdb
-import MySQLdb.cursors
+# import MySQLdb
+# import MySQLdb.cursors
 import pymongo
 from scrapy.http import Request
 from twisted.enterprise import adbapi
@@ -20,55 +20,49 @@ from scrapy.utils.project import get_project_settings
 settings = get_project_settings()
 
 
-# 示例 Pipeline
-class FashionWeekCrawlerPipeline(object):
-    def process_item(self, item, spider):
-        return item
-
-
-# 存储信息到 MySQL 的 Pipeline
-class MySQLStoreVoguePipeline(object):
-    def __init__(self):
-        dbargs = dict(
-            host=settings['MYSQL_HOST'],
-            db=settings['MYSQL_DBNAME'],
-            user=settings['MYSQL_USER'],
-            passwd=settings['MYSQL_PASSWD'],
-            charset='utf8',
-            cursorclass=MySQLdb.cursors.DictCursor,
-            use_unicode=True,
-        )
-        self.dbpool = adbapi.ConnectionPool('MySQLdb', **dbargs)
-
-    def open_spider(self, spider):
-        pass
-
-    def close_spider(self, spider):
-        self.dbpool.close()
-
-    def process_item(self, item, spider):
-        d = self.dbpool.runInteraction(self._do_upinsert, item, spider)
-        d.addErrback(self._handle_error, item, spider)
-        d.addBoth(lambda _: item)
-        return d
-
-    # 更新或者写入
-    def _do_upinsert(self, cursor, item, spider):
-        cursor.execute('select * from vogue where md5 = "%s"', (item['md5'],))  # redis
-        ret = cursor.fetchone()
-        if ret:
-            print 'item already exists in db'
-        else:
-            cursor.execute(
-                'insert into vogue(name, brand, md5, url, comment, city, year, season, type) values(%s, %s, %s, %s, %s, %s, %s, %s, %s)',
-                (item['name'], item['brand'], item['md5'], item['image_urls'][0], item['comment'], item['city'],
-                 item['year'],
-                 item['season'], item['type']))
-
-    # 错误处理
-    def _handle_error(self, failue, item, spider):
-        with open('pipelines_error.txt', 'a') as f:
-            f.write('pipeline failue %s\n url:%s\n' % (failue, item['url']))
+# # 存储信息到 MySQL 的 Pipeline
+# class MySQLStoreVoguePipeline(object):
+#     def __init__(self):
+#         dbargs = dict(
+#             host=settings['MYSQL_HOST'],
+#             db=settings['MYSQL_DBNAME'],
+#             user=settings['MYSQL_USER'],
+#             passwd=settings['MYSQL_PASSWD'],
+#             charset='utf8',
+#             cursorclass=MySQLdb.cursors.DictCursor,
+#             use_unicode=True,
+#         )
+#         self.dbpool = adbapi.ConnectionPool('MySQLdb', **dbargs)
+#
+#     def open_spider(self, spider):
+#         pass
+#
+#     def close_spider(self, spider):
+#         self.dbpool.close()
+#
+#     def process_item(self, item, spider):
+#         d = self.dbpool.runInteraction(self._do_upinsert, item, spider)
+#         d.addErrback(self._handle_error, item, spider)
+#         d.addBoth(lambda _: item)
+#         return d
+#
+#     # 更新或者写入
+#     def _do_upinsert(self, cursor, item, spider):
+#         cursor.execute('select * from vogue where md5 = "%s"', (item['md5'],))  # redis
+#         ret = cursor.fetchone()
+#         if ret:
+#             print 'item already exists in db'
+#         else:
+#             cursor.execute(
+#                 'insert into vogue(name, brand, md5, url, comment, city, year, season, type) values(%s, %s, %s, %s, %s, %s, %s, %s, %s)',
+#                 (item['name'], item['brand'], item['md5'], item['image_urls'][0], item['comment'], item['city'],
+#                  item['year'],
+#                  item['season'], item['type']))
+#
+#     # 错误处理
+#     def _handle_error(self, failue, item, spider):
+#         with open('pipelines_error.txt', 'a') as f:
+#             f.write('pipeline failue %s\n url:%s\n' % (failue, item['url']))
 
 
 # 去重Item的Pipeline
