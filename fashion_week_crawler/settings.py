@@ -32,7 +32,7 @@ NEWSPIDER_MODULE = 'fashion_week_crawler.spiders'
 
 # Mongodb database configure setting
 MONGO_HOST = '127.0.0.1'
-MONGO_PORT = '27017'
+MONGO_PORT = 27017
 MONGO_DB = 'fashionshow'
 MONGO_COLLECTION = 'vogue'
 
