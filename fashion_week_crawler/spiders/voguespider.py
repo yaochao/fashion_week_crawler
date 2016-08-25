@@ -38,8 +38,6 @@ class VoguespiderSpider(CrawlSpider):
             url = fashion_show.xpath('div/p/a/@href').extract()
             fashion_brand_list_item['name'] = name[0]
             fashion_brand_list_item['url'] = url[0]
-            with open('allfashionshow.txt', 'a') as f:
-                f.write(url[0] + '\n')
             yield scrapy.Request(url=url[0], callback=self.parse_fashion_show_detail)
 
         # 下一页链接的处理
@@ -105,7 +103,7 @@ class VoguespiderSpider(CrawlSpider):
             fashion_show_item['name'] = name
             fashion_show_item['image_urls'] = image_urls
             fashion_show_item['brand'] = brand
-            fashion_show_item['md5'] = md5
+            fashion_show_item['_id'] = md5
             fashion_show_item['comment'] = comment
             fashion_show_item['city'] = city
             fashion_show_item['year'] = year

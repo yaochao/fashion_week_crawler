@@ -8,9 +8,9 @@ import hashlib
 
 # import MySQLdb
 # import MySQLdb.cursors
+# from twisted.enterprise import adbapi
 import pymongo
 from scrapy.http import Request
-from twisted.enterprise import adbapi
 from scrapy.pipelines.images import ImagesPipeline
 from scrapy.exceptions import DropItem
 import os
@@ -71,10 +71,10 @@ class DuplicatesItemPipeline(object):
         self.seen = set()
 
     def process_item(self, item, spider):
-        if item['md5'] in self.seen:
+        if item['_id'] in self.seen:
             raise DropItem('Duplicate item found')
         else:
-            self.seen.add(item['md5'])
+            self.seen.add(item['_id'])
             return item
 
 
@@ -89,20 +89,21 @@ class MongodbStorePipeline(object):
         self.collection = self.db[settings['MONGO_COLLECTION']]
 
     def process_item(self, item, spider):
-        # 数据库去重
-        count = self.collection.find({'md5': item['md5']}).count()
-        if count:
-            raise DropItem('md5 already in db')
-        else:
+        try:
             self.collection.insert(dict(item))
+        except Exception as e:
+            print 'error---%s' % e
         return item
+
+    def close_spider(self, spider):
+        self.client.close()
 
 
 # 检测图片是否存在
 class DuplicatesImagePipeline(object):
     # 做为Pipeline, scrapy会自动调用此方法
     def process_item(self, item, spider):
-        filename = item['md5'] + '.jpg'
+        filename = item['_id'] + '.jpg'
         filepath = settings['IMAGES_STORE'] + filename
         if os.path.exists(filepath):
             raise DropItem("Image already exists")

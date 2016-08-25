@@ -23,7 +23,7 @@ class FashionBrandListItem(scrapy.Item):
 
 class FashionShowItem(scrapy.Item):
     name = scrapy.Field()
-    md5 = scrapy.Field()
+    _id = scrapy.Field() # md5(url)
     url = scrapy.Field()
     brand = scrapy.Field()
     image_urls = scrapy.Field()
