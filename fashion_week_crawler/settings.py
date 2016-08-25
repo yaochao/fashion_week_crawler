@@ -68,7 +68,7 @@ MONGO_COLLECTION = 'vogue'
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-    'fashion_week_crawler.middlewares.DownloaderMiddleware': 543,
+    'fashion_week_crawler.misc.middlewares.DownloaderMiddleware': 80,
 }
 
 # Enable or disable extensions
