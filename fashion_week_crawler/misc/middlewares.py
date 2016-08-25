@@ -3,15 +3,11 @@
 # Created by yaochao on 2016/8/11
 
 import random
-from scrapy.utils.project import get_project_settings
-
-settings = get_project_settings()
+from fashion_week_crawler.misc.useragents import USER_AGENTS
 
 
-class DownloaderMiddleware(object):
-    def __init__(self):
-        self.useragents = settings.getlist('USER_AGENTS')
-
+class UserAgentMiddleware(object):
     # 每当有request时,会自动调用此方法
     def process_request(self, request, spider):
-        request.headers.setdefault('User-Agent', random.choice(self.useragents))
+        user_agent = random.choice(USER_AGENTS)
+        request.headers['User-Agent'] = user_agent
