@@ -65,19 +65,6 @@ settings = get_project_settings()
 #             f.write('pipeline failue %s\n url:%s\n' % (failue, item['url']))
 
 
-# 去重Item的Pipeline
-class DuplicatesItemPipeline(object):
-    def __init__(self):
-        self.seen = set()
-
-    def process_item(self, item, spider):
-        if item['_id'] in self.seen:
-            raise DropItem('Duplicate item found')
-        else:
-            self.seen.add(item['_id'])
-            return item
-
-
 # 存储到Mongodb
 class MongodbStorePipeline(object):
     def __init__(self):
