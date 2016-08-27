@@ -4,6 +4,7 @@ from fashion_week_crawler.items import VogueFashionShowItem
 import scrapy
 import hashlib
 import re
+import copy
 
 
 class VoguespiderSpider(CrawlSpider):
@@ -29,7 +30,7 @@ class VoguespiderSpider(CrawlSpider):
                 item['brand_name'] = name[0]
                 item['brand_url'] = url[0]
                 request = scrapy.Request(url=url[0], callback=self.parse_brand_detail_list)
-                request.meta['item'] = item
+                request.meta['item'] = copy.deepcopy(item)
                 yield request
 
     def parse_brand_detail_list(self, response):
@@ -41,7 +42,7 @@ class VoguespiderSpider(CrawlSpider):
             item['fashionshow_name'] = name[0]
             item['fashionshow_url'] = url[0]
             request = scrapy.Request(url=url[0], callback=self.parse_fashion_show_detail)
-            request.meta['item'] = item
+            request.meta['item'] = copy.deepcopy(item)
             yield request
 
         # 下一页链接的处理
@@ -50,7 +51,7 @@ class VoguespiderSpider(CrawlSpider):
         if rst:
             next_link = rst[0].split('href=\'')[-1]
             request = scrapy.Request(url=next_link, callback=self.parse_brand_detail_list)
-            request.meta['item'] = response.meta['item']
+            request.meta['item'] = copy.deepcopy(response.meta['item'])
             yield request
 
     def parse_fashion_show_detail(self, response):
