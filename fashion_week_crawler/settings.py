@@ -80,7 +80,6 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'fashion_week_crawler.pipelines.DuplicatesItemPipeline':1,
     'fashion_week_crawler.pipelines.MongodbStorePipeline': 100,
     'fashion_week_crawler.pipelines.DuplicatesImagePipeline': 200,
     'fashion_week_crawler.pipelines.SaveImagesPipeline': 300,
