@@ -107,6 +107,6 @@ AUTOTHROTTLE_MAX_DELAY = 60
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 # save file to path:
-# IMAGES_STORE = '/Users/yaochao/Desktop/vogue/'
-IMAGES_STORE = '/data/datapark/yaochao/download/vogue/'
+IMAGES_STORE = '/Users/yaochao/Desktop/vogue/'
+# IMAGES_STORE = '/data/datapark/yaochao/download/vogue/'
 # IMAGES_STORE = '/home/yaochao/download/vogue/'

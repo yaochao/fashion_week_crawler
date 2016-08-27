@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from scrapy.spiders import CrawlSpider
-from fashion_week_crawler.items import FashionBrandItem, FashionBrandListItem, FashionShowItem
+from fashion_week_crawler.items import VogueFashionShowItem
 import scrapy
 import hashlib
 import re
@@ -19,43 +19,48 @@ class VoguespiderSpider(CrawlSpider):
     # }
 
     def parse(self, response):
-        fashion_brand_item = FashionBrandItem()
+        item = VogueFashionShowItem()
         namelists = response.xpath('//div[@class="nameList"]')
         for namelist in namelists:
             brands = namelist.xpath('ul/li')
             for brand in brands:
                 name = brand.xpath('a/text()').extract()
                 url = brand.xpath('a/@href').extract()
-                fashion_brand_item['name'] = name[0]
-                fashion_brand_item['url'] = url[0]
-                yield scrapy.Request(url=url[0], callback=self.parse_brand_detail_list)
+                item['brand_name'] = name[0]
+                item['brand_url'] = url[0]
+                request = scrapy.Request(url=url[0], callback=self.parse_brand_detail_list)
+                request.meta['item'] = item
+                yield request
 
     def parse_brand_detail_list(self, response):
-        fashion_brand_list_item = FashionBrandListItem()
+        item = response.meta['item']
         fashion_shows = response.xpath('//div[@class="xcl-p6"]')
         for fashion_show in fashion_shows:
             name = fashion_show.xpath('div/h2/text()').extract()
             url = fashion_show.xpath('div/p/a/@href').extract()
-            fashion_brand_list_item['name'] = name[0]
-            fashion_brand_list_item['url'] = url[0]
-            yield scrapy.Request(url=url[0], callback=self.parse_fashion_show_detail)
+            item['fashionshow_name'] = name[0]
+            item['fashionshow_url'] = url[0]
+            request = scrapy.Request(url=url[0], callback=self.parse_fashion_show_detail)
+            request.meta['item'] = item
+            yield request
 
         # 下一页链接的处理
         next_link_re = r'<a  href=\'(.*?)\' >下一页'
         rst = re.findall(next_link_re, response.body)
         if rst:
             next_link = rst[0].split('href=\'')[-1]
-            yield scrapy.Request(url=next_link, callback=self.parse_brand_detail_list)
+            request = scrapy.Request(url=next_link, callback=self.parse_brand_detail_list)
+            request.meta['item'] = response.meta['item']
+            yield request
 
     def parse_fashion_show_detail(self, response):
-        fashion_show_item = FashionShowItem()
+        item = response.meta['item']
         title = response.xpath('//div[@class="xc-list-tt"]/h1/a/text()').extract()
         if len(title) == 0:
             print '页面不存在%s' % response.url
             return
         title = title[0]
         title_sp = title.split('20')
-        brand = title_sp[0]
         img_title = '20' + title_sp[1]
 
         # 提取city, year, season
@@ -95,23 +100,20 @@ class VoguespiderSpider(CrawlSpider):
         for photo in photos:
             url = photo.xpath('img/@crs').extract()[0]
             url_sp = url.split('#')
-            url = url_sp[0]
-            image_urls = []
-            image_urls.append(url)
+            image_url = url_sp[0]
             md5 = self.md5(url)
             name = img_title + url_sp[1]
-            fashion_show_item['name'] = name
-            fashion_show_item['image_urls'] = image_urls
-            fashion_show_item['brand'] = brand
-            fashion_show_item['_id'] = md5
-            fashion_show_item['comment'] = comment
-            fashion_show_item['city'] = city
-            fashion_show_item['year'] = year
-            fashion_show_item['type'] = type
-            fashion_show_item['season'] = season
+            item['image_name'] = name
+            item['image_url'] = image_url
+            item['_id'] = md5
+            item['comment'] = comment
+            item['city'] = city
+            item['year'] = year
+            item['type'] = type
+            item['season'] = season
             with open('allimageurl.txt', 'a') as f:
-                f.write(fashion_show_item['image_urls'][0] + '\n')
-            yield fashion_show_item
+                f.write(item['image_url'] + '\n')
+            yield item
 
     def md5(self, str):
         m = hashlib.md5()

@@ -5,31 +5,19 @@
 # See documentation in:
 # http://doc.scrapy.org/en/latest/topics/items.html
 
-import scrapy
+from scrapy import Item, Field
 
 
-class FashionWeekCrawlerItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
-
-class FashionBrandItem(scrapy.Item):
-    name = scrapy.Field()
-    url = scrapy.Field()
-
-class FashionBrandListItem(scrapy.Item):
-    name = scrapy.Field()
-    url = scrapy.Field()
-
-class FashionShowItem(scrapy.Item):
-    name = scrapy.Field()
-    _id = scrapy.Field() # md5(url)
-    url = scrapy.Field()
-    brand = scrapy.Field()
-    image_urls = scrapy.Field()
-    image_paths = scrapy.Field()
-    comment = scrapy.Field()
-    city = scrapy.Field()
-    year = scrapy.Field()
-    season = scrapy.Field()
-    type = scrapy.Field()
+class VogueFashionShowItem(Item):
+    _id = Field()  # md5(url)
+    brand_name = Field()
+    brand_url = Field()
+    fashionshow_name = Field()
+    fashionshow_url = Field()
+    image_url = Field()
+    image_name = Field()
+    comment = Field()
+    city = Field()
+    year = Field()
+    season = Field()
+    type = Field()
