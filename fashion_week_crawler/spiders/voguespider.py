@@ -112,8 +112,6 @@ class VoguespiderSpider(CrawlSpider):
             item['year'] = year
             item['type'] = type
             item['season'] = season
-            with open('allimageurl.txt', 'a') as f:
-                f.write(item['image_url'] + '\n')
             yield item
 
     def md5(self, str):
