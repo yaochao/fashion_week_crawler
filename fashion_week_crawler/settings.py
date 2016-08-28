@@ -15,6 +15,7 @@ SPIDER_MODULES = ['fashion_week_crawler.spiders']
 NEWSPIDER_MODULE = 'fashion_week_crawler.spiders'
 
 
+
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'fashion_week_crawler (+http://www.yourdomain.com)'
 
@@ -70,6 +71,12 @@ MONGO_COLLECTION = 'vogue'
 DOWNLOADER_MIDDLEWARES = {
     'fashion_week_crawler.misc.middlewares.UserAgentMiddleware': 80,
 }
+
+DOWNLOAD_TIMEOUT = 20
+ROBOTSTXT_OBEY = False
+SCHEDULER = 'scrapy.core.scheduler.Scheduler'
+STATS_CLASS = 'scrapy.statscollectors.MemoryStatsCollector'
+STATS_DUMP = True
 
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
