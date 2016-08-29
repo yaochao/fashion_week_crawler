@@ -14,6 +14,7 @@ from scrapy.http import Request
 from scrapy.pipelines.images import ImagesPipeline
 from scrapy.exceptions import DropItem
 import os
+import logging
 from scrapy.utils.project import get_project_settings
 
 # settings.py
@@ -79,7 +80,8 @@ class MongodbStorePipeline(object):
         try:
             self.collection.insert(dict(item))
         except Exception as e:
-            print 'error---%s' % e
+            logger = logging.getLogger('MongodbStorePipeline')
+            logger.error(e)
         return item
 
     def close_spider(self, spider):

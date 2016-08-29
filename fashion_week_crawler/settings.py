@@ -14,6 +14,12 @@ BOT_NAME = 'fashion_week_crawler'
 SPIDER_MODULES = ['fashion_week_crawler.spiders']
 NEWSPIDER_MODULE = 'fashion_week_crawler.spiders'
 
+# Logging
+LOG_LEVEL = 'ERROR'
+LOG_FORMAT = '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
+LOG_FILE = 'scrapy.log'
+
+
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'fashion_week_crawler (+http://www.yourdomain.com)'
 
@@ -112,6 +118,6 @@ ITEM_PIPELINES = {
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 # save file to path:
-# IMAGES_STORE = '/Users/yaochao/Desktop/vogue/'
-IMAGES_STORE = '/data/datapark/yaochao/download/vogue/'
+IMAGES_STORE = '/Users/yaochao/Desktop/vogue/'
+# IMAGES_STORE = '/data/datapark/yaochao/download/vogue/'
 # IMAGES_STORE = '/home/yaochao/download/vogue/'

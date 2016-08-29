@@ -5,6 +5,7 @@ import scrapy
 import hashlib
 import re
 import copy
+import logging
 
 
 class VoguespiderSpider(CrawlSpider):
@@ -58,7 +59,8 @@ class VoguespiderSpider(CrawlSpider):
         item = response.meta['item']
         title = response.xpath('//div[@class="xc-list-tt"]/h1/a/text()').extract()
         if len(title) == 0:
-            print '页面不存在%s' % response.url
+            logger = logging.getLogger('parse_fashion_show_detail')
+            logger.warning('页面不存在%s' % response.url)
             return
         title = title[0]
         title_sp = title.split('20')
