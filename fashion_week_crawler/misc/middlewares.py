@@ -6,6 +6,7 @@ import random
 from fashion_week_crawler.misc.useragents import USER_AGENTS
 
 
+# DownloadMiddleware
 class UserAgentMiddleware(object):
     # 每当有request时,会自动调用此方法
     def process_request(self, request, spider):
