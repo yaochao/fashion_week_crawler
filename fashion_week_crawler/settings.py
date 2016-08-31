@@ -74,7 +74,8 @@ MONGO_COLLECTION_GQ = 'gq'
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-    'fashion_week_crawler.misc.middlewares.UserAgentMiddleware': 80,
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+    'fashion_week_crawler.misc.middlewares.UserAgentMiddleware': 400,
 }
 
 DOWNLOAD_TIMEOUT = 20
