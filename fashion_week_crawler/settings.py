@@ -15,9 +15,9 @@ SPIDER_MODULES = ['fashion_week_crawler.spiders']
 NEWSPIDER_MODULE = 'fashion_week_crawler.spiders'
 
 # Logging
-LOG_LEVEL = 'ERROR'
-LOG_FORMAT = '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
-LOG_FILE = 'scrapy.log'
+# LOG_LEVEL = 'ERROR'
+# LOG_FORMAT = '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
+# LOG_FILE = 'scrapy.log'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
@@ -39,7 +39,8 @@ LOG_FILE = 'scrapy.log'
 MONGO_HOST = '127.0.0.1'
 MONGO_PORT = 27017
 MONGO_DB = 'fashionshow'
-MONGO_COLLECTION = 'vogue1'
+MONGO_COLLECTION_VOGUE = 'vogue'
+MONGO_COLLECTION_GQ = 'gq'
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 # CONCURRENT_REQUESTS = 32
@@ -118,6 +119,7 @@ ITEM_PIPELINES = {
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 # save file to path:
-IMAGES_STORE = '/Users/yaochao/Desktop/vogue/'
-# IMAGES_STORE = '/data/datapark/yaochao/download/vogue/'
-# IMAGES_STORE = '/home/yaochao/download/vogue/'
+
+# 注意这里, 使用scrapy自带的ImagesPipeline的默认存储路径是settings.py里面的 IMAGES_STORE 对应的值
+IMAGES_STORE = '/Users/yaochao/Desktop/'
+# IMAGES_STORE = '/data/datapark/yaochao/download/'

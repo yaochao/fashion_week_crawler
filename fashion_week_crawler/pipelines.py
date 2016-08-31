@@ -16,54 +16,10 @@ from scrapy.exceptions import DropItem
 import os
 import logging
 from scrapy.utils.project import get_project_settings
+from  fashion_week_crawler.items import VogueFashionShowItem, GqFashionShowItem
 
 # settings.py
 settings = get_project_settings()
-
-
-# # 存储信息到 MySQL 的 Pipeline
-# class MySQLStoreVoguePipeline(object):
-#     def __init__(self):
-#         dbargs = dict(
-#             host=settings['MYSQL_HOST'],
-#             db=settings['MYSQL_DBNAME'],
-#             user=settings['MYSQL_USER'],
-#             passwd=settings['MYSQL_PASSWD'],
-#             charset='utf8',
-#             cursorclass=MySQLdb.cursors.DictCursor,
-#             use_unicode=True,
-#         )
-#         self.dbpool = adbapi.ConnectionPool('MySQLdb', **dbargs)
-#
-#     def open_spider(self, spider):
-#         pass
-#
-#     def close_spider(self, spider):
-#         self.dbpool.close()
-#
-#     def process_item(self, item, spider):
-#         d = self.dbpool.runInteraction(self._do_upinsert, item, spider)
-#         d.addErrback(self._handle_error, item, spider)
-#         d.addBoth(lambda _: item)
-#         return d
-#
-#     # 更新或者写入
-#     def _do_upinsert(self, cursor, item, spider):
-#         cursor.execute('select * from vogue where md5 = "%s"', (item['md5'],))  # redis
-#         ret = cursor.fetchone()
-#         if ret:
-#             print 'item already exists in db'
-#         else:
-#             cursor.execute(
-#                 'insert into vogue(name, brand, md5, url, comment, city, year, season, type) values(%s, %s, %s, %s, %s, %s, %s, %s, %s)',
-#                 (item['name'], item['brand'], item['md5'], item['image_urls'][0], item['comment'], item['city'],
-#                  item['year'],
-#                  item['season'], item['type']))
-#
-#     # 错误处理
-#     def _handle_error(self, failue, item, spider):
-#         with open('pipelines_error.txt', 'a') as f:
-#             f.write('pipeline failue %s\n url:%s\n' % (failue, item['url']))
 
 
 # 存储到Mongodb
@@ -74,11 +30,17 @@ class MongodbStorePipeline(object):
             settings['MONGO_PORT']
         )
         self.db = self.client[settings['MONGO_DB']]
-        self.collection = self.db[settings['MONGO_COLLECTION']]
+        self.collection_vogue = self.db[settings['MONGO_COLLECTION_VOGUE']]
+        self.collection_gq = self.db[settings['MONGO_COLLECTION_GQ']]
 
     def process_item(self, item, spider):
+        if type(item) == VogueFashionShowItem:
+            collection = self.collection_vogue
+        else:
+            collection = self.collection_gq
+
         try:
-            self.collection.insert(dict(item))
+            collection.insert(dict(item))
         except Exception as e:
             logger = logging.getLogger('MongodbStorePipeline')
             logger.error(e)
@@ -90,10 +52,14 @@ class MongodbStorePipeline(object):
 
 # 检测图片是否存在
 class DuplicatesImagePipeline(object):
-    # 做为Pipeline, scrapy会自动调用此方法
     def process_item(self, item, spider):
+        if type(item) == VogueFashionShowItem:
+            basepath = settings['IMAGES_STORE'] + 'vogue/'
+        else:
+            basepath = settings['IMAGES_STORE'] + 'gq/'
+
         filename = item['_id'] + '.jpg'
-        filepath = settings['IMAGES_STORE'] + filename
+        filepath = basepath + filename
         if os.path.exists(filepath):
             raise DropItem("Image already exists")
         else:
@@ -116,7 +82,11 @@ class SaveImagesPipeline(ImagesPipeline):
             url = request
         else:
             url = request.url
-        return self.md5(url) + '.jpg'
+        if url.find('vogueimg') != -1:
+            folder = 'vogue/'
+        else:
+            folder = 'gq/'
+        return folder + self.md5(url) + '.jpg'
 
     def md5(self, str):
         m = hashlib.md5()
