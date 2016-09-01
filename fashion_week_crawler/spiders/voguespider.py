@@ -6,7 +6,8 @@ import hashlib
 import re
 import copy
 import logging
-
+import urllib2
+import json
 
 class VoguespiderSpider(CrawlSpider):
     name = "vogue"
@@ -33,7 +34,8 @@ class VoguespiderSpider(CrawlSpider):
         'city_list': '//*[@id="main"]/div[2]/div[1]/p[2]/a[2]/text()',
         'type_sel': '//*[@id="main"]/div[2]/div[1]/p[2]/a[1]/text()',
         'comment_sel': '//div[@class="content"]/div[@class="section xcl-text"]/div[@class="txt"]/text()',
-
+        'photos_mark': '//ul[@class="bd"]/li[@class="item"]',
+        'data_url': '//*[@class="fullscreen"]/param[2]/@value',
     }
 
     def parse(self, response):
@@ -108,15 +110,20 @@ class VoguespiderSpider(CrawlSpider):
                 if comm.strip() != '':
                     comment = comment + comm.strip() + ','
 
-        # 提取图片
-        photos = response.xpath('//ul[@class="bd"]/li[@class="item"]')
+        # # 提取小图片
+        # photos = response.xpath('//ul[@class="bd"]/li[@class="item"]')
+        # for photo in photos:
+        #     url = photo.xpath('img/@crs').extract()[0]
+
+        # 提取原始大图
+        data_url = response.xpath(self.x_query['data_url']).extract_first().split('&')[2].split('=')[-1]
+        res = urllib2.urlopen(data_url)
+        photos = json.loads(res.read())
+        photos = photos['slides']
         for photo in photos:
-            url = photo.xpath('img/@crs').extract()[0]
-            url_sp = url.split('_mark.jpg')
-            image_url = url_sp[0]
-            md5 = self.md5(url)
-            name = img_title + url_sp[1]
-            item['image_name'] = name
+            image_url = photo['src']
+            md5 = self.md5(image_url)
+            item['image_name'] = img_title + str(photos.index(photo)+1)
             item['image_url'] = image_url
             item['_id'] = md5
             item['comment'] = comment

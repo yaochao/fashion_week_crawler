@@ -39,7 +39,7 @@ NEWSPIDER_MODULE = 'fashion_week_crawler.spiders'
 MONGO_HOST = '127.0.0.1'
 MONGO_PORT = 27017
 MONGO_DB = 'fashionshow'
-MONGO_COLLECTION_VOGUE = 'vogue'
+MONGO_COLLECTION_VOGUE = 'vogueraw'
 MONGO_COLLECTION_GQ = 'gq'
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
