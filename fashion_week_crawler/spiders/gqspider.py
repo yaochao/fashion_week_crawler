@@ -19,7 +19,7 @@ class VoguespiderSpider(CrawlSpider):
         'fashion_shows': '//h3',
         'fashionshow_name': 'a/em/text()',
         'fashionshow_url': 'a/@href',
-        'page_next': '//*[@class="page-next"]/@href',
+        'page_next': '//a[@class="page-next"]/@href',
         'image_title': '//div[@class="links"]/a/text()',
         'images': '//div[@class="listBox"]/div[2]/div/ul/li',
         'comments': '//div[@class="text"]/text()',
