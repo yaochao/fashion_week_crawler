@@ -81,7 +81,7 @@ class VoguespiderSpider(CrawlSpider):
         i = 0
         for image_url in images:
             i = i + 1
-            image_url = image_url.replace('100X150', '400X600')
+            image_url = image_url.split('.100X150.jpg')[0]
             md5 = self.md5(image_url)
             image_name = title + str(i)
             item['_id'] = md5
@@ -91,7 +91,7 @@ class VoguespiderSpider(CrawlSpider):
             item['sex'] = u'男'
             item['city'] = None
             item['type'] = u'高级成衣'
-            yield item
+            # yield item
 
     def md5(self, str):
         m = hashlib.md5()
