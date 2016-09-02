@@ -103,22 +103,22 @@ class SaveImagesPipeline(ImagesPipeline):
         return m.hexdigest()
 
 
-# kafka Pipeline
-class KafkaPipeline(object):
-    def __init__(self):
-        self.producer = KafkaProducer(bootstrap_servers=settings['KAFKA_URI'])
-
-    def process_item(self, item, spider):
-        if type(item) == VogueFashionShowItem:
-            topic = settings['TOPIC_VOGUE']
-        elif type(item) == GqFashionShowItem:
-            topic = settings['TOPIC_GQ']
-        else:
-            topic = settings['TOPIC_NOFASHION']
-        item = dict(item)
-        json_item =json.dumps(item)
-        self.producer.send(topic, json_item)
-        self.producer.flush()
-
-    def close_spider(self, spider):
-        self.producer.close()
+# # kafka Pipeline
+# class KafkaPipeline(object):
+#     def __init__(self):
+#         self.producer = KafkaProducer(bootstrap_servers=settings['KAFKA_URI'])
+#
+#     def process_item(self, item, spider):
+#         if type(item) == VogueFashionShowItem:
+#             topic = settings['TOPIC_VOGUE']
+#         elif type(item) == GqFashionShowItem:
+#             topic = settings['TOPIC_GQ']
+#         else:
+#             topic = settings['TOPIC_NOFASHION']
+#         item = dict(item)
+#         json_item =json.dumps(item)
+#         self.producer.send(topic, json_item)
+#         self.producer.flush()
+# 
+#     def close_spider(self, spider):
+#         self.producer.close()
