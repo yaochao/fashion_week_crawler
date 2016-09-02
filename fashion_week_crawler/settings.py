@@ -43,6 +43,13 @@ MONGO_COLLECTION_VOGUE = 'vogueraw'
 MONGO_COLLECTION_GQ = 'gq'
 MONGO_COLLECTION_NOFASHION = 'nofashion'
 
+# Kafka
+KAFKA_URI = '192.168.31.6:9092'
+TOPIC_VOGUE = 'scrapy_vogue'
+TOPIC_GQ = 'scrapy_gq'
+TOPIC_NOFASHION = 'scrapy_nofashion2'
+
+
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 # CONCURRENT_REQUESTS = 32
 
@@ -97,6 +104,7 @@ ITEM_PIPELINES = {
     'fashion_week_crawler.pipelines.MongodbStorePipeline': 100,
     'fashion_week_crawler.pipelines.DuplicatesImagePipeline': 200,
     'fashion_week_crawler.pipelines.SaveImagesPipeline': 300,
+    'fashion_week_crawler.pipelines.KafkaPipeline': 400,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

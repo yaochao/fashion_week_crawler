@@ -17,6 +17,8 @@ import os
 import logging
 from scrapy.utils.project import get_project_settings
 from  fashion_week_crawler.items import VogueFashionShowItem, GqFashionShowItem, NoFashionItem
+from kafka import KafkaProducer
+import json
 
 # settings.py
 settings = get_project_settings()
@@ -33,7 +35,6 @@ class MongodbStorePipeline(object):
         self.collection_vogue = self.db[settings['MONGO_COLLECTION_VOGUE']]
         self.collection_gq = self.db[settings['MONGO_COLLECTION_GQ']]
         self.collection_nofashion = self.db[settings['MONGO_COLLECTION_NOFASHION']]
-
 
     def process_item(self, item, spider):
         if type(item) == VogueFashionShowItem:
@@ -100,3 +101,24 @@ class SaveImagesPipeline(ImagesPipeline):
         m = hashlib.md5()
         m.update(str)
         return m.hexdigest()
+
+
+# kafka Pipeline
+class KafkaPipeline(object):
+    def __init__(self):
+        self.producer = KafkaProducer(bootstrap_servers=settings['KAFKA_URI'])
+
+    def process_item(self, item, spider):
+        if type(item) == VogueFashionShowItem:
+            topic = settings['TOPIC_VOGUE']
+        elif type(item) == GqFashionShowItem:
+            topic = settings['TOPIC_GQ']
+        else:
+            topic = settings['TOPIC_NOFASHION']
+        item = dict(item)
+        json_item =json.dumps(item)
+        self.producer.send(topic, json_item)
+        self.producer.flush()
+
+    def close_spider(self, spider):
+        self.producer.close()
