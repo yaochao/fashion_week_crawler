@@ -16,7 +16,7 @@ from scrapy.exceptions import DropItem
 import os
 import logging
 from scrapy.utils.project import get_project_settings
-from  fashion_week_crawler.items import VogueFashionShowItem, GqFashionShowItem
+from  fashion_week_crawler.items import VogueFashionShowItem, GqFashionShowItem, NoFashionItem
 
 # settings.py
 settings = get_project_settings()
@@ -32,12 +32,16 @@ class MongodbStorePipeline(object):
         self.db = self.client[settings['MONGO_DB']]
         self.collection_vogue = self.db[settings['MONGO_COLLECTION_VOGUE']]
         self.collection_gq = self.db[settings['MONGO_COLLECTION_GQ']]
+        self.collection_nofashion = self.db[settings['MONGO_COLLECTION_NOFASHION']]
+
 
     def process_item(self, item, spider):
         if type(item) == VogueFashionShowItem:
             collection = self.collection_vogue
-        else:
+        elif type(item) == GqFashionShowItem:
             collection = self.collection_gq
+        else:
+            collection = self.collection_nofashion
 
         try:
             collection.insert(dict(item))
@@ -55,8 +59,10 @@ class DuplicatesImagePipeline(object):
     def process_item(self, item, spider):
         if type(item) == VogueFashionShowItem:
             basepath = settings['IMAGES_STORE'] + 'vogue/'
-        else:
+        elif type(item) == GqFashionShowItem:
             basepath = settings['IMAGES_STORE'] + 'gq/'
+        else:
+            basepath = settings['IMAGES_STORE'] + 'nofashion/'
 
         filename = item['_id'] + '.jpg'
         filepath = basepath + filename
@@ -84,8 +90,10 @@ class SaveImagesPipeline(ImagesPipeline):
             url = request.url
         if url.find('vogueimg') != -1:
             folder = 'vogue/'
-        else:
+        elif url.find('gqimg') != -1:
             folder = 'gq/'
+        else:
+            folder = 'nofashion/'
         return folder + self.md5(url) + '.jpg'
 
     def md5(self, str):

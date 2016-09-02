@@ -41,6 +41,7 @@ MONGO_PORT = 27017
 MONGO_DB = 'fashionshow'
 MONGO_COLLECTION_VOGUE = 'vogueraw'
 MONGO_COLLECTION_GQ = 'gq'
+MONGO_COLLECTION_NOFASHION = 'nofashion'
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 # CONCURRENT_REQUESTS = 32

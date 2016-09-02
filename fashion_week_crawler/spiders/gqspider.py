@@ -7,7 +7,7 @@ import re
 import copy
 
 
-class VoguespiderSpider(CrawlSpider):
+class GqSpider(CrawlSpider):
     name = "gq"
     start_urls = (
         'http://shows.gq.com.cn/',
@@ -91,7 +91,7 @@ class VoguespiderSpider(CrawlSpider):
             item['sex'] = u'男'
             item['city'] = None
             item['type'] = u'高级成衣'
-            # yield item
+            yield item
 
     def md5(self, str):
         m = hashlib.md5()
