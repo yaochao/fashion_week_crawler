@@ -42,12 +42,14 @@ MONGO_DB = 'fashionshow'
 MONGO_COLLECTION_VOGUE = 'vogueraw'
 MONGO_COLLECTION_GQ = 'gq'
 MONGO_COLLECTION_NOFASHION = 'nofashion'
+MONGO_COLLECTION_HAIBAO = 'haibao'
 
 # Kafka
 KAFKA_URI = '192.168.31.6:9092'
 TOPIC_VOGUE = 'scrapy_vogue'
 TOPIC_GQ = 'scrapy_gq'
 TOPIC_NOFASHION = 'scrapy_nofashion2'
+TOPIC_HAIBAO = 'scrapy_haibao'
 
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
@@ -104,7 +106,7 @@ ITEM_PIPELINES = {
     'fashion_week_crawler.pipelines.MongodbStorePipeline': 100,
     'fashion_week_crawler.pipelines.DuplicatesImagePipeline': 200,
     'fashion_week_crawler.pipelines.SaveImagesPipeline': 300,
-    'fashion_week_crawler.pipelines.KafkaPipeline': 400,
+    # 'fashion_week_crawler.pipelines.KafkaPipeline': 400,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -131,5 +133,5 @@ ITEM_PIPELINES = {
 # save file to path:
 
 # 注意这里, 使用scrapy自带的ImagesPipeline的默认存储路径是settings.py里面的 IMAGES_STORE 对应的值
-# IMAGES_STORE = '/Users/yaochao/Desktop/'
-IMAGES_STORE = '/data/datapark/yaochao/download/'
+IMAGES_STORE = '/Users/yaochao/Desktop/'
+# IMAGES_STORE = '/data/datapark/yaochao/download/'

@@ -22,6 +22,7 @@ class VogueFashionShowItem(Item):
     season = Field()
     type = Field()
 
+
 class GqFashionShowItem(Item):
     _id = Field()  # md5(image_url)
     brand_name = Field()
@@ -37,12 +38,29 @@ class GqFashionShowItem(Item):
     type = Field()
     sex = Field()
 
+
 class NoFashionItem(Item):
     _id = Field()  # md5(image_url)
     brand_name = Field()
     subject_url = Field()
     subject_title = Field()
     brand_url = Field()
+    fashionshow_name = Field()
+    fashionshow_url = Field()
+    image_url = Field()
+    image_name = Field()
+    comment = Field()
+    city = Field()
+    year = Field()
+    season = Field()
+    type = Field()
+    sex = Field()
+
+
+class HaibaoItem(Item):
+    _id = Field()  # md5(image_url)
+    brand_name = Field()
+    index_url = Field()
     fashionshow_name = Field()
     fashionshow_url = Field()
     image_url = Field()

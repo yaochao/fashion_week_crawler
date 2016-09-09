@@ -5,20 +5,16 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import hashlib
+import logging
+import os
 
-# import MySQLdb
-# import MySQLdb.cursors
-# from twisted.enterprise import adbapi
 import pymongo
+from scrapy.exceptions import DropItem
 from scrapy.http import Request
 from scrapy.pipelines.images import ImagesPipeline
-from scrapy.exceptions import DropItem
-import os
-import logging
 from scrapy.utils.project import get_project_settings
-from  fashion_week_crawler.items import VogueFashionShowItem, GqFashionShowItem, NoFashionItem
-from kafka import KafkaProducer
-import json
+
+from  fashion_week_crawler.items import VogueFashionShowItem, GqFashionShowItem, NoFashionItem, HaibaoItem
 
 # settings.py
 settings = get_project_settings()
@@ -35,14 +31,17 @@ class MongodbStorePipeline(object):
         self.collection_vogue = self.db[settings['MONGO_COLLECTION_VOGUE']]
         self.collection_gq = self.db[settings['MONGO_COLLECTION_GQ']]
         self.collection_nofashion = self.db[settings['MONGO_COLLECTION_NOFASHION']]
+        self.collection_haibao = self.db[settings['MONGO_COLLECTION_HAIBAO']]
 
     def process_item(self, item, spider):
         if type(item) == VogueFashionShowItem:
             collection = self.collection_vogue
         elif type(item) == GqFashionShowItem:
             collection = self.collection_gq
-        else:
+        elif type(item) == NoFashionItem:
             collection = self.collection_nofashion
+        else:
+            collection = self.collection_haibao
 
         try:
             collection.insert(dict(item))
@@ -62,8 +61,10 @@ class DuplicatesImagePipeline(object):
             basepath = settings['IMAGES_STORE'] + 'vogue/'
         elif type(item) == GqFashionShowItem:
             basepath = settings['IMAGES_STORE'] + 'gq/'
-        else:
+        elif type(item) == NoFashionItem:
             basepath = settings['IMAGES_STORE'] + 'nofashion/'
+        else:
+            basepath = settings['IMAGES_STORE'] + 'haibao/'
 
         filename = item['_id'] + '.jpg'
         filepath = basepath + filename
@@ -93,15 +94,16 @@ class SaveImagesPipeline(ImagesPipeline):
             folder = 'vogue/'
         elif url.find('gqimg') != -1:
             folder = 'gq/'
-        else:
+        elif url.find('nofashion') != -1:
             folder = 'nofashion/'
+        else:
+            folder = 'haibao/'
         return folder + self.md5(url) + '.jpg'
 
     def md5(self, str):
         m = hashlib.md5()
         m.update(str)
         return m.hexdigest()
-
 
 # # kafka Pipeline
 # class KafkaPipeline(object):
