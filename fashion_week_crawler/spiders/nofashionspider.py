@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
-from scrapy.spiders import CrawlSpider
-from fashion_week_crawler.items import NoFashionItem
-from scrapy.http import Request
+import copy
 import hashlib
 import re
-import copy
+
+from scrapy.http import Request
+from scrapy.spiders import CrawlSpider
+
+from fashion_week_crawler.items import NoFashionItem
 
 
 class NoFashionSpider(CrawlSpider):

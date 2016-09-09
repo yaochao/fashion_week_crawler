@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
-from scrapy.spiders import CrawlSpider
-from fashion_week_crawler.items import VogueFashionShowItem
-import scrapy
-import hashlib
-import re
 import copy
-import logging
-import urllib2
+import hashlib
 import json
+import logging
+import re
+import urllib2
+
+import scrapy
+from scrapy.spiders import CrawlSpider
+
+from fashion_week_crawler.items import VogueFashionShowItem
+
 
 class VoguespiderSpider(CrawlSpider):
     name = "vogue"
@@ -123,7 +126,7 @@ class VoguespiderSpider(CrawlSpider):
         for photo in photos:
             image_url = photo['src']
             md5 = self.md5(image_url)
-            item['image_name'] = img_title + str(photos.index(photo)+1)
+            item['image_name'] = img_title + str(photos.index(photo) + 1)
             item['image_url'] = image_url
             item['_id'] = md5
             item['comment'] = comment
