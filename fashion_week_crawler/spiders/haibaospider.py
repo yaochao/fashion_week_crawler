@@ -3,6 +3,7 @@
 # Created by yaochao on 2016/9/9
 
 import copy
+import hashlib
 
 from scrapy import Request
 from scrapy.spiders import Spider
@@ -20,7 +21,7 @@ class HaibaoSpider(Spider):
         item = HaibaoItem()
         uls = response.xpath('//div[@class="listlabel lab_new"]/ul')
         for ul in uls:
-            lis = ul.xpath['li']
+            lis = ul.xpath('li')
             for li in lis:
                 page_url = li.xpath('div/a/@href').extract_first()
                 page_url = page_url.split('/')[-1]
@@ -40,8 +41,14 @@ class HaibaoSpider(Spider):
     def parse_fashionshow(self, response):
         item = response.meta['item']
         image_urls = response.xpath('//li[@class="jsImageUrlList"]/a/img/@imgurl').extract()
-        image_descs = response.xpath('//li[@class="jsImageUrlList"]/a/img/@imgurl').extract()
+        image_descs = response.xpath('//li[@class="jsImageUrlList"]/a/img/@desc').extract()
         for image_url in image_urls:
+            item['_id'] = self.md5(image_url)
             item['image_url'] = image_url
-            item['image_name'] = image_descs[0] + str(image_urls.index(image_url))
+            item['image_name'] = image_descs[0] + ' - ' +str(image_urls.index(image_url))
             yield item
+
+    def md5(self, str):
+        m = hashlib.md5()
+        m.update(str)
+        return m.hexdigest()
