@@ -91,7 +91,7 @@ class SaveImagesPipeline(ImagesPipeline):
         else:
             url = request.url
         if url.find('vogueimg') != -1:
-            folder = 'vogue/'
+            folder = 'vogueraw/'
         elif url.find('gqimg') != -1:
             folder = 'gq/'
         elif url.find('nofashion') != -1:
