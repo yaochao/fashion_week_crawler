@@ -14,7 +14,7 @@ from scrapy.http import Request
 from scrapy.pipelines.images import ImagesPipeline
 from scrapy.utils.project import get_project_settings
 
-from  fashion_week_crawler.items import VogueFashionShowItem, GqFashionShowItem, NoFashionItem, HaibaoItem
+from  fashion_week_crawler.items import VogueFashionShowItem, GqFashionShowItem, NoFashionItem, HaibaoItem, ULiaoBaoItem
 
 # settings.py
 settings = get_project_settings()
@@ -32,6 +32,7 @@ class MongodbStorePipeline(object):
         self.collection_gq = self.db[settings['MONGO_COLLECTION_GQ']]
         self.collection_nofashion = self.db[settings['MONGO_COLLECTION_NOFASHION']]
         self.collection_haibao = self.db[settings['MONGO_COLLECTION_HAIBAO']]
+        self.collection_uliaobao = self.db[settings['MONGO_COLLECTION_ULIAOBAO']]
 
     def process_item(self, item, spider):
         if type(item) == VogueFashionShowItem:
@@ -40,8 +41,16 @@ class MongodbStorePipeline(object):
             collection = self.collection_gq
         elif type(item) == NoFashionItem:
             collection = self.collection_nofashion
-        else:
+        elif type(item) == HaibaoItem:
             collection = self.collection_haibao
+        else:
+            collection = self.collection_uliaobao
+            try:
+                collection.insert(dict(item))
+            except Exception as e:
+                logger = logging.getLogger('MongodbStorePipeline')
+                logger.error(e)
+            return
 
         try:
             collection.insert(dict(item))

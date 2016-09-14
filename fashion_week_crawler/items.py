@@ -71,3 +71,26 @@ class HaibaoItem(Item):
     season = Field()
     type = Field()
     sex = Field()
+
+class LadyMaxItem(Item):
+    _id = Field()  # md5(image_url)
+    brand_name = Field()
+    index_url = Field()
+    fashionshow_name = Field()
+    fashionshow_url = Field()
+    image_url = Field()
+    image_name = Field()
+    comment = Field()
+    city = Field()
+    year = Field()
+    season = Field()
+    type = Field()
+    sex = Field()
+
+class ULiaoBaoItem(Item):
+    _id = Field()
+    category_url = Field()
+    url = Field()
+    category = Field()
+    title = Field()
+    image_url = Field()
