@@ -14,7 +14,7 @@ from scrapy.http import Request
 from scrapy.pipelines.images import ImagesPipeline
 from scrapy.utils.project import get_project_settings
 
-from  fashion_week_crawler.items import VogueFashionShowItem, GqFashionShowItem, NoFashionItem, HaibaoItem, ULiaoBaoItem
+from  fashion_week_crawler.items import VogueFashionShowItem, GqFashionShowItem, NoFashionItem, HaibaoItem
 
 # settings.py
 settings = get_project_settings()
@@ -45,21 +45,24 @@ class MongodbStorePipeline(object):
             collection = self.collection_haibao
         else:
             collection = self.collection_uliaobao
-            try:
-                collection.insert(dict(item))
-            except Exception as e:
-                logger = logging.getLogger('MongodbStorePipeline')
-                logger.error(e)
-            return
 
         try:
             collection.insert(dict(item))
         except Exception as e:
             logger = logging.getLogger('MongodbStorePipeline')
             logger.error(e)
-        return item
+            return item
+
+    def __del__(self):
+        print '__del__'
 
     def close_spider(self, spider):
+        print 'close_spider'
+        self.collection_nofashion.close()
+        self.collection_gq.close()
+        self.collection_vogue.close()
+        self.collection_uliaobao.close()
+        self.collection_haibao.close()
         self.client.close()
 
 
