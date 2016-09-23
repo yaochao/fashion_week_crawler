@@ -134,5 +134,5 @@ ITEM_PIPELINES = {
 # save file to path:
 
 # 注意这里, 使用scrapy自带的ImagesPipeline的默认存储路径是settings.py里面的 IMAGES_STORE 对应的值
-IMAGES_STORE = '/Users/yaochao/Desktop/'
-# IMAGES_STORE = '/data/datapark/yaochao/download/'
+# IMAGES_STORE = '/Users/yaochao/Desktop/'
+IMAGES_STORE = '/data/datapark/yaochao/download/'
