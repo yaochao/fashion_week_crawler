@@ -97,4 +97,4 @@ class ULiaoBaoItem(Item):
 
 class WeiboItem(Item):
     text = Field()
-    created_timestamp = Field()
+    time = Field()

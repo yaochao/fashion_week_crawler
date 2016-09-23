@@ -3,7 +3,7 @@
 # Created by yaochao on 2016/9/23
 import json
 from bs4 import BeautifulSoup
-
+import time
 from scrapy import Spider, Request
 
 from fashion_week_crawler.items import WeiboItem
@@ -49,6 +49,9 @@ class WeiboSpider(Spider):
             for string in soup.strings:
                 text = text + string
             item['text'] = text
-            item['created_timestamp'] = mblog['created_timestamp']
+            timestamp = mblog['created_timestamp']
+            t = time.localtime(float(timestamp))
+            t = time.strftime('%Y年%m月%d日 %H:%M:%S', t)
+            item['time'] = t
             print item
             yield item
