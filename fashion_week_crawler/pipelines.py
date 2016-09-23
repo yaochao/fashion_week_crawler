@@ -19,6 +19,11 @@ from  fashion_week_crawler.items import VogueFashionShowItem, GqFashionShowItem,
 # settings.py
 settings = get_project_settings()
 
+# weibo pipeline
+class WeiboPipeline(object):
+    def process_item(self, item, spider):
+        return item
+
 
 # 存储到Mongodb
 class MongodbStorePipeline(object):
@@ -51,7 +56,7 @@ class MongodbStorePipeline(object):
         except Exception as e:
             logger = logging.getLogger('MongodbStorePipeline')
             logger.error(e)
-            return item
+        return item
 
     def __del__(self):
         print '__del__'

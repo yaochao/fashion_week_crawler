@@ -94,3 +94,7 @@ class ULiaoBaoItem(Item):
     category = Field()
     title = Field()
     image_url = Field()
+
+class WeiboItem(Item):
+    text = Field()
+    created_timestamp = Field()
