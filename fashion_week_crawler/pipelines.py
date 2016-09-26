@@ -63,11 +63,6 @@ class MongodbStorePipeline(object):
 
     def close_spider(self, spider):
         print 'close_spider'
-        self.collection_nofashion.close()
-        self.collection_gq.close()
-        self.collection_vogue.close()
-        self.collection_uliaobao.close()
-        self.collection_haibao.close()
         self.client.close()
 
 

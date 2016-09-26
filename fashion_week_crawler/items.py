@@ -98,3 +98,7 @@ class ULiaoBaoItem(Item):
 class WeiboItem(Item):
     text = Field()
     time = Field()
+
+class WeixinItem(Item):
+    text = Field()
+    time = Field()
