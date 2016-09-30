@@ -102,3 +102,4 @@ class WeiboItem(Item):
 class WeixinItem(Item):
     text = Field()
     time = Field()
+    title = Field()
