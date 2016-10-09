@@ -24,6 +24,28 @@ class WeiboPipeline(object):
     def process_item(self, item, spider):
         return item
 
+# autohome mongodb pipeline
+class AutohomeMongodbPipeline(object):
+    def __init__(self):
+        self.client = pymongo.MongoClient(
+            settings['MONGO_HOST'],
+            settings['MONGO_PORT']
+        )
+        self.db = self.client['autohome']
+        self.config_collection = self.db['config']
+        self.koubei_collection = self.db['koubei']
+
+    def process_item(self, item, spider):
+        try:
+            if item['seriesitem_id']:
+                self.koubei_collection.insert(dict(item))
+            else:
+                self.config_collection.insert(dict(item))
+        except Exception as e:
+            logger = logging.getLogger('AutohomeMongodbPipeline')
+            logger.error(e)
+        return item
+
 
 # 存储到Mongodb
 class MongodbStorePipeline(object):
