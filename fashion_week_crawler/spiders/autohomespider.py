@@ -42,19 +42,19 @@ class AutohomeSpider(Spider):
                 request = Request(url=koubei_url, callback=self.parse_koubei, headers=self.headers2)
                 request.meta['seriesitem_id'] = seriesitem_id
                 yield request
-                # for specitemgroup in specitemgroups:
-                #     specitems = specitemgroup['specitems']
-                #     for specitem in specitems:
-                #         specitem_id = specitem['id']
-                #         request = Request(url='http://124.202.166.57/cfg_v7.0.0/cars/speccompare.ashx?type=1&cityid=110100&pl=2&specids=' + str(specitem_id), callback=self.parse_config, headers=self.headers1)
-                #         request.meta['specitem_id'] = specitem_id
-                #         yield request
+                for specitemgroup in specitemgroups:
+                    specitems = specitemgroup['specitems']
+                    for specitem in specitems:
+                        specitem_id = specitem['id']
+                        request = Request(url='http://124.202.166.57/cfg_v7.0.0/cars/speccompare.ashx?type=1&cityid=110100&pl=2&specids=' + str(specitem_id), callback=self.parse_config, headers=self.headers1)
+                        request.meta['specitem_id'] = specitem_id
+                        yield request
 
-    # def parse_config(self, response):
-    #     specitem_id = response.meta['specitem_id']
-    #     dict = json.loads(response.body)
-    #     dict['_id'] = specitem_id
-    #     yield dict
+    def parse_config(self, response):
+        specitem_id = response.meta['specitem_id']
+        dict = json.loads(response.body)
+        dict['_id'] = specitem_id
+        yield dict
 
     def parse_koubei(self, response):
         seriesitem_id = response.meta['seriesitem_id']
