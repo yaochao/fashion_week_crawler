@@ -19,10 +19,41 @@ from  fashion_week_crawler.items import VogueFashionShowItem, GqFashionShowItem,
 # settings.py
 settings = get_project_settings()
 
+
 # weibo pipeline
 class WeiboPipeline(object):
     def process_item(self, item, spider):
         return item
+
+
+# autohome mongodb pipeline
+class YicheMongodbPipeline(object):
+    def __init__(self):
+        self.client = pymongo.MongoClient(
+            settings['MONGO_HOST'],
+            settings['MONGO_PORT']
+        )
+        self.db = self.client['yiche']
+        self.config_collection = self.db['config']
+        self.koubei_collection = self.db['koubei']
+        self.carname_collection = self.db['carname']
+        self.configmap_collection = self.db['configmap']
+
+    def process_item(self, item, spider):
+        try:
+            if 'serialID' in item.keys():
+                self.config_collection.insert(dict(item))
+            elif 'carname' in item.keys():
+                self.carname_collection.insert(dict(item))
+            elif 'serialID_koubei' in item.keys():
+                self.koubei_collection.insert(dict(item))
+            else:
+                self.configmap_collection.insert(dict(item))
+        except Exception as e:
+            logger = logging.getLogger('YicheMongodbPipeline')
+            logger.error(e)
+        return item
+
 
 # autohome mongodb pipeline
 class AutohomeMongodbPipeline(object):
@@ -37,7 +68,7 @@ class AutohomeMongodbPipeline(object):
 
     def process_item(self, item, spider):
         try:
-            if item['seriesitem_id']:
+            if 'seriesitem_id' in item.keys():
                 self.koubei_collection.insert(dict(item))
             else:
                 self.config_collection.insert(dict(item))

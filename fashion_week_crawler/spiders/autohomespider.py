@@ -28,8 +28,6 @@ class AutohomeSpider(Spider):
     def start_requests(self):
         yield Request(url=self.start_urls[0], callback=self.parse, headers=self.headers1)
 
-    a = set()
-
     def parse(self, response):
         dict = json.loads(response.body)
         if dict['message'] == 'ok':
