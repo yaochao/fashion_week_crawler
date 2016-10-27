@@ -35,10 +35,13 @@ class AutohomeSpider(Spider):
             for seriesitem in seriesitems:
                 specitemgroups = seriesitem['specitemgroups']
                 seriesitem_id = seriesitem['id']
+                seriesname = seriesitem['seriesname']
+
                 koubei_url = 'http://221.193.246.117/autov6.0.0/alibi/seriesalibiinfos-pm2-ss' + str(
                     seriesitem_id) + '-st0-p1-s20.json'
                 request = Request(url=koubei_url, callback=self.parse_koubei, headers=self.headers2)
                 request.meta['seriesitem_id'] = seriesitem_id
+                request.meta['seriesname'] = seriesname
                 yield request
                 for specitemgroup in specitemgroups:
                     specitems = specitemgroup['specitems']
@@ -56,8 +59,11 @@ class AutohomeSpider(Spider):
 
     def parse_koubei(self, response):
         seriesitem_id = response.meta['seriesitem_id']
+        seriesname = response.meta['seriesname']
         dict = json.loads(response.body)
         list = dict['result']['list']
+        average = dict['result']['average']
+        yield {'_id': seriesitem_id, 'seriesname': seriesname, 'average': average}
         for i in list:
             Koubeiid = i['Koubeiid']
             koubei_content_url = 'http://221.193.246.117/autov6.0.0/alibi/alibiinfobase-pm2-k'+ str(Koubeiid) +'.json'

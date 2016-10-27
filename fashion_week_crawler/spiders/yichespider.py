@@ -50,12 +50,19 @@ class YicheSpider(Spider):
                 request.meta['serialID'] = serialID
                 request.meta['serialName'] = serialName
                 yield request
+
                 # 口碑
                 request2 = Request(url='http://42.62.1.150/koubei/GetTopicList?serialID=' + str(
                     serialID) + '&carid=0&pageIndex=1&pageSize=20', callback=self.parse_koubei,
                                    headers=self.headers2)
                 request2.meta['serialID'] = serialID
                 yield request2
+
+                # 评分
+                request = Request(url='http://42.62.1.156/koubei/GetReviewImpression?serialId=' + str(serialID), callback=self.parse_average, headers=self.headers2)
+                request.meta['serialName'] = serialName
+                request.meta['serialID'] = serialID
+                yield request
 
     def parse_carids(self, response):
         dict = json.loads(response.body)
@@ -112,3 +119,11 @@ class YicheSpider(Spider):
                 yield request
             dict['serialID_koubei'] = serialID
             yield dict
+
+    def parse_average(self, response):
+        dict = json.loads(response.body)
+        serialID = response.meta['serialID']
+        serialName = response.meta['serialName']
+        average = dict['data']['AverageRating']
+        if dict['message'] == u'成功':
+            yield {'_id':serialID, 'name': serialName, 'average': average}

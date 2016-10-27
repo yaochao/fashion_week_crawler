@@ -38,6 +38,7 @@ class YicheMongodbPipeline(object):
         self.koubei_collection = self.db['koubei']
         self.carname_collection = self.db['carname']
         self.configmap_collection = self.db['configmap']
+        self.average_collection = self.db['average']
 
     def process_item(self, item, spider):
         try:
@@ -47,6 +48,8 @@ class YicheMongodbPipeline(object):
                 self.carname_collection.insert(dict(item))
             elif 'serialID_koubei' in item.keys():
                 self.koubei_collection.insert(dict(item))
+            elif 'average' in item.keys():
+                self.average_collection.insert(dict(item))
             else:
                 self.configmap_collection.insert(dict(item))
         except Exception as e:
@@ -65,11 +68,14 @@ class AutohomeMongodbPipeline(object):
         self.db = self.client['autohome']
         self.config_collection = self.db['config']
         self.koubei_collection = self.db['koubei']
+        self.average_collection = self.db['average']
 
     def process_item(self, item, spider):
         try:
             if 'seriesitem_id' in item.keys():
                 self.koubei_collection.insert(dict(item))
+            elif 'average' in item.keys():
+                self.average_collection.insert(dict(item))
             else:
                 self.config_collection.insert(dict(item))
         except Exception as e:
