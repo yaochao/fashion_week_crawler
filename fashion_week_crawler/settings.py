@@ -14,6 +14,11 @@ BOT_NAME = 'fashion_week_crawler'
 SPIDER_MODULES = ['fashion_week_crawler.spiders']
 NEWSPIDER_MODULE = 'fashion_week_crawler.spiders'
 
+# JSONRPC(原来的webservice,已经单独分离开了:https://github.com/scrapy-plugins/scrapy-jsonrpc)
+JSONRPC_ENABLED = True
+JSONRPC_HOST = '127.0.0.1'
+JSONRPC_PORT = [6080, 7030]
+
 # Logging
 # LOG_LEVEL = 'ERROR'
 # LOG_FORMAT = '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
@@ -39,7 +44,7 @@ NEWSPIDER_MODULE = 'fashion_week_crawler.spiders'
 MONGO_HOST = '127.0.0.1'
 MONGO_PORT = 27017
 MONGO_DB = 'fashionshow'
-MONGO_COLLECTION_VOGUE = 'vogueraw'
+MONGO_COLLECTION_VOGUE = 'vogueraw2'
 MONGO_COLLECTION_GQ = 'gq'
 MONGO_COLLECTION_NOFASHION = 'nofashion'
 MONGO_COLLECTION_HAIBAO = 'haibao'
@@ -97,9 +102,10 @@ STATS_DUMP = True
 
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
-# EXTENSIONS = {
-#    'scrapy.extensions.telnet.TelnetConsole': None,
-# }
+EXTENSIONS = {
+   # 'scrapy.extensions.telnet.TelnetConsole': None,
+    'scrapy_jsonrpc.webservice.WebService': 500,
+}
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
@@ -134,5 +140,5 @@ ITEM_PIPELINES = {
 # save file to path:
 
 # 注意这里, 使用scrapy自带的ImagesPipeline的默认存储路径是settings.py里面的 IMAGES_STORE 对应的值
-# IMAGES_STORE = '/Users/yaochao/Desktop/'
-IMAGES_STORE = '/data/datapark/yaochao/download/'
+IMAGES_STORE = '/Users/yaochao/Desktop/'
+# IMAGES_STORE = '/data/datapark/yaochao/download/'
