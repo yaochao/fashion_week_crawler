@@ -35,8 +35,7 @@ class GqSpider(CrawlSpider):
             item['page_url'] = href
             request = Request(url=href, callback=self.parse_brand_list)
             request.meta['item'] = copy.deepcopy(item)
-            if href == 'http://shows.gq.com.cn/2017-ss-MEN/':
-                yield request
+            yield request
 
 
     def parse_brand_list(self, response):
