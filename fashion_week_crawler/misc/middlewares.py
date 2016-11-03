@@ -11,4 +11,4 @@ class UserAgentMiddleware(object):
     # 每当有request时,会自动调用此方法
     def process_request(self, request, spider):
         user_agent = random.choice(USER_AGENTS)
-        request.headers['User-Agent'] = user_agent
+        # request.headers['User-Agent'] = user_agent

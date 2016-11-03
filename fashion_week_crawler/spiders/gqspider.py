@@ -29,37 +29,33 @@ class GqSpider(CrawlSpider):
 
     def parse(self, response):
         item = GqFashionShowItem()
-        brandlists = response.xpath(self.x_path['brandlists'])
-        for brandlist in brandlists:
-            brands = brandlist.xpath(self.x_path['brands'])
-            for brand in brands:
-                brand_name = brand.xpath('text()').extract_first()
-                item['brand_name'] = brand_name
-                item['brand_url'] = brand.xpath('@href').extract_first()
-                request = Request(url=item['brand_url'], callback=self.parse_brand_detail_list)
-                request.meta['item'] = copy.deepcopy(item)
+        a_s = response.xpath('//div[@id="js-shows-scroll"]/div[@class="select-cont"]/div[@class="viewport"]/div/div/a')
+        for a in a_s:
+            href = a.xpath('@href').extract_first()
+            item['page_url'] = href
+            request = Request(url=href, callback=self.parse_brand_list)
+            request.meta['item'] = copy.deepcopy(item)
+            if href == 'http://shows.gq.com.cn/2017-ss-MEN/':
                 yield request
 
-    def parse_brand_detail_list(self, response):
+
+    def parse_brand_list(self, response):
         item = response.meta['item']
-        fashion_shows = response.xpath(self.x_path['fashion_shows'])
-        for fashion_show in fashion_shows:
-            fashionshow_name = fashion_show.xpath(self.x_path['fashionshow_name']).extract_first()
-            year = fashionshow_name[0:4]
-            season = fashionshow_name[4:]
+        picitems = response.xpath('//div[@class="item pic-item"]')
+        for picitem in picitems:
+            href = picitem.xpath('a/@href').extract_first()
+            title = picitem.xpath('img/@alt').extract_first()
+            brand = picitem.xpath('span/text()').extract_first()
+            year = title.split(brand)[1][:4]
+            city = title.split(brand)[1][4:6]
+            season = title.split(brand)[1][6:8]
             item['year'] = year
             item['season'] = season
-            item['fashionshow_name'] = fashionshow_name
-            item['fashionshow_url'] = fashion_show.xpath(self.x_path['fashionshow_url']).extract_first()
-            request = Request(url=item['fashionshow_url'], callback=self.parse_fashion_show_detail)
+            item['city'] = city
+            item['fashionshow_name'] = title
+            item['fashionshow_url'] = href
+            request = Request(url=href, callback=self.parse_fashion_show_detail)
             request.meta['item'] = copy.deepcopy(item)
-            yield request
-
-        # 下一页链接的处理
-        next_link = response.xpath(self.x_path['page_next']).extract_first()
-        if next_link:
-            request = Request(url=next_link, callback=self.parse_brand_detail_list)
-            request.meta['item'] = copy.deepcopy(response.meta['item'])
             yield request
 
     def parse_fashion_show_detail(self, response):
@@ -80,9 +76,7 @@ class GqSpider(CrawlSpider):
         images_re = r'var tshowsData = \["(.*?)"\];'
         images_str = re.findall(images_re, response.body)[0]
         images = images_str.split('","')
-        i = 0
-        for image_url in images:
-            i = i + 1
+        for i, image_url in enumerate(images):
             image_url = image_url.split('.100X150.jpg')[0]
             md5 = self.md5(image_url)
             image_name = title + str(i)
@@ -91,8 +85,7 @@ class GqSpider(CrawlSpider):
             item['image_url'] = image_url
             item['comment'] = comment
             item['sex'] = u'男'
-            item['city'] = None
-            item['type'] = u'高级成衣'
+            item['type'] = None
             yield item
 
     def md5(self, str):

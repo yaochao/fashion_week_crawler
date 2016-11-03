@@ -26,6 +26,7 @@ class VogueFashionShowItem(Item):
 class GqFashionShowItem(Item):
     _id = Field()  # md5(image_url)
     brand_name = Field()
+    page_url = Field()
     brand_url = Field()
     fashionshow_name = Field()
     fashionshow_url = Field()
