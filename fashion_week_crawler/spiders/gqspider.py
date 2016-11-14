@@ -48,6 +48,7 @@ class GqSpider(CrawlSpider):
             year = title.split(brand)[1][:4]
             city = title.split(brand)[1][4:6]
             season = title.split(brand)[1][6:8]
+            item['brand_name'] = brand
             item['year'] = year
             item['season'] = season
             item['city'] = city
