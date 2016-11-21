@@ -104,3 +104,9 @@ class WeixinItem(Item):
     text = Field()
     time = Field()
     title = Field()
+
+class AdmItem(Item):
+    _id = Field()
+    img_url = Field()
+    name = Field()
+    intro = Field()

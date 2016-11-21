@@ -7,7 +7,7 @@
 import hashlib
 import logging
 import os
-
+import MySQLdb
 import pymongo
 from scrapy.exceptions import DropItem
 from scrapy.http import Request
@@ -18,7 +18,7 @@ from  fashion_week_crawler.items import VogueFashionShowItem, GqFashionShowItem,
 
 # settings.py
 settings = get_project_settings()
-
+logger = logging.getLogger(__name__)
 
 # weibo pipeline
 class WeiboPipeline(object):
@@ -118,10 +118,10 @@ class MongodbStorePipeline(object):
         return item
 
     def __del__(self):
-        print '__del__'
+        print('__del__')
 
     def close_spider(self, spider):
-        print 'close_spider'
+        print('close_spider')
         self.client.close()
 
 
@@ -175,6 +175,63 @@ class SaveImagesPipeline(ImagesPipeline):
         m = hashlib.md5()
         m.update(str)
         return m.hexdigest()
+
+
+# Adm Pipeline
+class AdmImagePipeline(ImagesPipeline):
+    def get_media_requests(self, item, info):
+        request = Request(item['img_url'])
+        request.meta['item'] = item
+        yield request
+
+    def file_path(self, request, response=None, info=None):
+        item = request.meta['item']
+        img = item['_id'] + '.jpg'
+        return img
+
+    def item_completed(self, results, item, info):
+        img_paths = [x['path'] for ok, x in results if ok]
+        if not img_paths:
+            raise DropItem('Item contains no images')
+        return item
+
+
+# 存储到Mongodb
+class AdmMongoPipeline(object):
+    def __init__(self):
+        self.client = pymongo.MongoClient(
+            settings['MONGO_HOST'],
+            settings['MONGO_PORT']
+        )
+        self.db = self.client['Adm']
+        self.collection = self.db['experts']
+
+    def process_item(self, item, spider):
+        try:
+            self.collection.insert(dict(item))
+        except Exception as e:
+            logger.error(e)
+        return item
+
+    def close_spider(self, spider):
+        self.client.close()
+
+# MySQL Pipeline
+class AdmMysqlPipeline(object):
+    def __init__(self):
+        self.connection = MySQLdb.connect(host='192.168.39.25', port=3306, user='root', passwd='7Rgag9o868YigP2E', db='dataparkcn', charset='utf8')
+        self.cursor = self.connection.cursor()
+
+    def process_item(self, item, spider):
+        sql = 'insert into experts_imgs (img_md5, img_url, expert_name, expert_info) VALUES ("%s", "%s", "%s", "%s")' % (item['_id'], item['img_url'], item['name'], item['intro'])
+        print sql
+        self.cursor.execute(sql)
+        self.connection.commit()
+
+    def __del__(self):
+        self.cursor.close()
+        self.connection.close()
+
 
 # # kafka Pipeline
 # class KafkaPipeline(object):
