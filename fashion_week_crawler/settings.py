@@ -42,6 +42,7 @@ JSONRPC_PORT = [6080, 7030]
 
 # Mongodb database configure setting
 MONGO_HOST = '127.0.0.1'
+# MONGO_HOST = '192.168.39.26'
 MONGO_PORT = 27017
 MONGO_DB = 'fashionshow'
 MONGO_COLLECTION_VOGUE = 'vogueraw2'
@@ -56,6 +57,10 @@ TOPIC_VOGUE = 'scrapy_vogue'
 TOPIC_GQ = 'scrapy_gq'
 TOPIC_NOFASHION = 'scrapy_nofashion2'
 TOPIC_HAIBAO = 'scrapy_haibao'
+TOPIC_AUTOHOME_KOUBEI = 'autohome_koubei'
+TOPIC_AUTOHOME_PURCHASE_GOAL = 'autohome_purchase_goal'
+TOPIC_AUTOHOME_TROUBLE_RANK = 'autohome_trouble_rank'
+TOPIC_AUTOHOME_TROUBLE_DETAIL = 'autohome_trouble_detail'
 
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
@@ -140,5 +145,5 @@ ITEM_PIPELINES = {
 # save file to path:
 
 # 注意这里, 使用scrapy自带的ImagesPipeline的默认存储路径是settings.py里面的 IMAGES_STORE 对应的值
-# IMAGES_STORE = '/Users/yaochao/Desktop/fashionshow/'
-IMAGES_STORE = '/data/datapark/yaochao/download/'
+IMAGES_STORE = '/Users/yaochao/Desktop/fashionshow/'
+# IMAGES_STORE = '/data/datapark/yaochao/download/'

@@ -10,7 +10,7 @@ from scrapy import Spider
 class AutohomeSpider(Spider):
     name = 'autohome'
     start_urls = [
-        'http://124.202.166.57/cars_v7.1.0/cars/searchcars.ashx?pm=2&minp=0&maxp=0&levels=18%2C19&cids=&gs=&sts=&dsc=&configs=&order=2&pindex=1&psize=1000&bids=&fids=&drives=&seats=&attribute=0'
+        'http://sou2.api.autohome.com.cn/wrap/souche/?cs=1&ignores=content&size=50&tm=app&um=list_ranking&q='
     ]
     custom_settings = {
         'ITEM_PIPELINES': {
@@ -25,6 +25,8 @@ class AutohomeSpider(Spider):
         'Host': 'koubei.app.autohome.com.cn'
     }
 
+
+
     def start_requests(self):
         yield Request(url=self.start_urls[0], callback=self.parse, headers=self.headers1)
 
@@ -37,7 +39,7 @@ class AutohomeSpider(Spider):
                 seriesitem_id = seriesitem['id']
                 seriesname = seriesitem['seriesname']
 
-                koubei_url = 'http://221.193.246.117/autov6.0.0/alibi/seriesalibiinfos-pm2-ss' + str(
+                koubei_url = 'http://121.22.246.106/autov6.0.0/alibi/seriesalibiinfos-pm2-ss' + str(
                     seriesitem_id) + '-st0-p1-s20.json'
                 request = Request(url=koubei_url, callback=self.parse_koubei, headers=self.headers2)
                 request.meta['seriesitem_id'] = seriesitem_id
@@ -66,7 +68,7 @@ class AutohomeSpider(Spider):
         yield {'_id': seriesitem_id, 'seriesname': seriesname, 'average': average}
         for i in list:
             Koubeiid = i['Koubeiid']
-            koubei_content_url = 'http://221.193.246.117/autov6.0.0/alibi/alibiinfobase-pm2-k'+ str(Koubeiid) +'.json'
+            koubei_content_url = 'http://121.22.246.106/autov6.0.0/alibi/alibiinfobase-pm2-k'+ str(Koubeiid) +'.json'
             request = Request(url=koubei_content_url, callback=self.parse_koubei_content, headers=self.headers2)
             request.meta['seriesitem_id'] = seriesitem_id
             request.meta['Koubeiid'] = Koubeiid
@@ -74,7 +76,7 @@ class AutohomeSpider(Spider):
         pagecount = dict['result']['pagecount']
         for i in xrange(pagecount):
             i = i + 1
-            koubei_url = 'http://221.193.246.117/autov6.0.0/alibi/seriesalibiinfos-pm2-ss' + str(
+            koubei_url = 'http://121.22.246.106/autov6.0.0/alibi/seriesalibiinfos-pm2-ss' + str(
                 seriesitem_id) + '-st0-p' + str(i) + '-s20.json'
             request = Request(url=koubei_url, callback=self.parse_koubei, headers=self.headers2)
             request.meta['seriesitem_id'] = seriesitem_id

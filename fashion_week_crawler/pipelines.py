@@ -5,10 +5,13 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import hashlib
+import json
 import logging
 import os
+
 import MySQLdb
 import pymongo
+from kafka import KafkaProducer
 from scrapy.exceptions import DropItem
 from scrapy.http import Request
 from scrapy.pipelines.images import ImagesPipeline
@@ -19,6 +22,7 @@ from  fashion_week_crawler.items import VogueFashionShowItem, GqFashionShowItem,
 # settings.py
 settings = get_project_settings()
 logger = logging.getLogger(__name__)
+
 
 # weibo pipeline
 class WeiboPipeline(object):
@@ -79,9 +83,42 @@ class AutohomeMongodbPipeline(object):
             else:
                 self.config_collection.insert(dict(item))
         except Exception as e:
-            logger = logging.getLogger('AutohomeMongodbPipeline')
             logger.error(e)
         return item
+
+
+# Autohome_copy
+class AutohomePipeline(object):
+    def __init__(self):
+        self.client = pymongo.MongoClient(
+            settings['MONGO_HOST'],
+            settings['MONGO_PORT']
+        )
+        self.db = self.client['autohome2']
+        self.config_collection = self.db['config']
+        self.koubei_collection = self.db['koubei']
+        self.purchase_goal_collection = self.db['purchase_goal']
+        self.trouble_rank = self.db['trouble_rank']
+        self.trouble_detail = self.db['trouble_detail']
+
+    def process_item(self, item, spider):
+        try:
+            if item['type'] == 'koubei':
+                self.koubei_collection.insert(dict(item))
+            elif item['type'] == 'purchase_goal':
+                self.purchase_goal_collection.insert(dict(item))
+            elif item['type'] == 'trouble_rank':
+                self.trouble_rank.insert(dict(item))
+            elif item['type'] == 'trouble_detail':
+                self.trouble_detail.insert(dict(item))
+            else:
+                self.config_collection.insert(dict(item))
+        except Exception as e:
+            logger.error(e)
+        return item
+
+    def close_spider(self, spider):
+        self.client.close()
 
 
 # 存储到Mongodb
@@ -117,13 +154,31 @@ class MongodbStorePipeline(object):
             logger.error(e)
         return item
 
-    def __del__(self):
-        print('__del__')
-
     def close_spider(self, spider):
         print('close_spider')
         self.client.close()
 
+# 存储到Mongodb - Vogue
+class VogueMongodbStorePipeline(object):
+    def __init__(self):
+        self.client = pymongo.MongoClient(
+            settings['MONGO_HOST'],
+            settings['MONGO_PORT']
+        )
+        self.db = self.client['fashionshow']
+        self.collection_vogue = self.db['vogue_t']
+
+    def process_item(self, item, spider):
+
+        try:
+            self.collection_vogue.insert(dict(item))
+        except Exception as e:
+            logger.error(e)
+        return item
+
+    def close_spider(self, spider):
+        print('close_spider')
+        self.client.close()
 
 # 检测图片是否存在
 class DuplicatesImagePipeline(object):
@@ -216,20 +271,22 @@ class AdmMongoPipeline(object):
     def close_spider(self, spider):
         self.client.close()
 
+
 # MySQL Pipeline
 class AdmMysqlPipeline(object):
     def __init__(self):
-        self.connection = MySQLdb.connect(host='192.168.39.25', port=3306, user='root', passwd='7Rgag9o868YigP2E', db='dataparkcn', charset='utf8')
+        self.connection = MySQLdb.connect(host='192.168.39.25', port=3306, user='root', passwd='7Rgag9o868YigP2E',
+                                          db='dataparkcn', charset='utf8')
         self.cursor = self.connection.cursor()
 
     def process_item(self, item, spider):
-        sql = 'insert into experts_imgs (img_md5, img_url, expert_name, expert_info) VALUES ("%s", "%s", "%s", "%s")' % (item['_id'], item['img_url'], item['name'], item['intro'])
+        sql = 'insert into experts_imgs (img_md5, img_url, expert_name, expert_info) VALUES ("%s", "%s", "%s", "%s")' % (
+            item['_id'], item['img_url'], item['name'], item['intro'])
         print sql
         self.cursor.execute(sql)
         self.connection.commit()
 
-    def __del__(self):
-        self.cursor.close()
+    def close_spider(self, spider):
         self.connection.close()
 
 
@@ -252,3 +309,29 @@ class AdmMysqlPipeline(object):
 # 
 #     def close_spider(self, spider):
 #         self.producer.close()
+
+
+# kafka Pipeline
+class AutohomeKafkaPipeline(object):
+    def __init__(self):
+        self.producer = KafkaProducer(bootstrap_servers=settings['KAFKA_URI'])
+
+    def process_item(self, item, spider):
+        if item['type'] != 'config':
+            if item['type'] == 'purchase_goal':
+                topic = settings['TOPIC_AUTOHOME_PURCHASE_GOAL']
+            elif item['type'] == 'trouble_rank':
+                topic = settings['TOPIC_AUTOHOME_TROUBLE_RANK']
+            elif item['type'] == 'trouble_detail':
+                topic = settings['TOPIC_AUTOHOME_TROUBLE_DETAIL']
+            else:
+                topic = settings['TOPIC_AUTOHOME_KOUBEI']
+            item = dict(item)
+            json_item = json.dumps(item)
+            self.producer.send(topic, json_item)
+            self.producer.flush()
+
+    # 这里遇到的问题: 一开始从__del__(稀构函数)里面关闭的close,导致的问题,是producer没有写入kafka就关闭了,
+    # 正确的关闭应该是从scrapy的关闭函数进行关闭。
+    def close_spider(self, spider):
+        self.producer.close()
