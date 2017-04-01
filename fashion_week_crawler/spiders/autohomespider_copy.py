@@ -15,7 +15,7 @@ class AutohomeSpider(Spider):
     custom_settings = {
         'ITEM_PIPELINES': {
             'fashion_week_crawler.pipelines.AutohomePipeline': 100,
-            'fashion_week_crawler.pipelines.AutohomeKafkaPipeline': 200,
+            # 'fashion_week_crawler.pipelines.AutohomeKafkaPipeline': 200,
         },
     }
 
@@ -39,43 +39,44 @@ class AutohomeSpider(Spider):
         'Host': 'koubei.app.autohome.com.cn'
     }
 
-    carnames = ['比亚迪S7', '瑞风S7', 'CS95', '传祺GS8', '力帆X80', '东南DX9']
+    carnames = ['比亚迪S7', '瑞风S7', 'CS95', '传祺GS8', '力帆X80', '东南DX9', '哈弗h6', '传祺gs4', '荣威RX5', '昂科威']
     # carnames = ['比亚迪S7']
+
 
     def start_requests(self):
         for i in self.carnames:
             url = self.start_urls[0] + i
-            yield Request(url=url, callback=self.parse)
+            yield Request(url=url, callback=self.parse1)
 
-    def parse(self, response):
+    def parse1(self, response):
         result = json.loads(response.body)
         result = result['result']
         if result:
             carid = result['list'][0]['id']
-            # 口碑,从App接口获取
-            koubei_url_app = 'http://121.22.246.106/autov6.0.0/alibi/seriesalibiinfos-pm2-ss' + str(
-                carid) + '-st0-p1-s20.json'
-            request = Request(url=koubei_url_app, callback=self.parse_koubei_list_app, headers=self.koubei_header_app)
-            request.meta['carid'] = carid
-            yield request
-
-            # 购买目的,单独从Web上提出来
-            koubei_url_pc = 'http://k.autohome.com.cn/' + str(carid)
-            request = Request(url=koubei_url_pc, callback=self.parse_koubei_list_pc, headers=self.koubei_header_pc)
-            request.meta['carid'] = carid
-            yield request
-
-            # 配置, 从App接口提取
-            config_url = 'http://124.202.166.57/carinfo_v7.3.0/cars/seriessummary-pm2-s' + str(carid) + '-t-c110100.json'
-            request = Request(config_url, callback=self.parse_car_specids, headers=self.headers1)
-            request.meta['carid'] = carid
-            yield request
-
-            # 故障 detail
-            trouble_url = 'http://124.164.9.98/quality_v5.6.0/quality/qualitycategorypercent-sid'+str(carid)+'-t1.json'
-            request = Request(url=trouble_url, callback=self.parse_trouble_list, headers=self.headers2)
-            request.meta['carid'] = carid
-            yield request
+            # # 口碑,从App接口获取
+            # koubei_url_app = 'http://121.22.246.106/autov6.0.0/alibi/seriesalibiinfos-pm2-ss' + str(
+            #     carid) + '-st0-p1-s20.json'
+            # request = Request(url=koubei_url_app, callback=self.parse_koubei_list_app, headers=self.koubei_header_app)
+            # request.meta['carid'] = carid
+            # yield request
+            #
+            # # 购买目的,单独从Web上提出来
+            # koubei_url_pc = 'http://k.autohome.com.cn/' + str(carid)
+            # request = Request(url=koubei_url_pc, callback=self.parse_koubei_list_pc, headers=self.koubei_header_pc)
+            # request.meta['carid'] = carid
+            # yield request
+            #
+            # # 配置, 从App接口提取
+            # config_url = 'http://124.202.166.57/carinfo_v7.3.0/cars/seriessummary-pm2-s' + str(carid) + '-t-c110100.json'
+            # request = Request(config_url, callback=self.parse_car_specids, headers=self.headers1)
+            # request.meta['carid'] = carid
+            # yield request
+            #
+            # # 故障 detail
+            # trouble_url = 'http://124.164.9.98/quality_v5.6.0/quality/qualitycategorypercent-sid'+str(carid)+'-t1.json'
+            # request = Request(url=trouble_url, callback=self.parse_trouble_list, headers=self.headers2)
+            # request.meta['carid'] = carid
+            # yield request
 
             # 故障 rank
             trouble_url2 = 'http://app.k.autohome.com.cn/' + str(carid) + '/appquality?type=1'
@@ -84,7 +85,6 @@ class AutohomeSpider(Spider):
             yield request
 
     def parse_trouble_rank(self, response):
-        print response.url
         carid = response.meta['carid']
         lis = response.xpath('//section[@class="list-quality"]/ul/li')
         trouble_rank = []

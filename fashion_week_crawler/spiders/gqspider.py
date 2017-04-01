@@ -11,31 +11,19 @@ from fashion_week_crawler.items import GqFashionShowItem
 
 class GqSpider(CrawlSpider):
     name = "gq"
-    start_urls = (
-        'http://shows.gq.com.cn/',
-    )
+    start_urls = ['http://shows.gq.com.cn/']
 
-    x_path = {
-        'brandlists': '//div[@id="js-retrieval-scroll"]/div[2]/div[2]',
-        'brands': 'div/div/a',
-        'fashion_shows': '//h3',
-        'fashionshow_name': 'a/em/text()',
-        'fashionshow_url': 'a/@href',
-        'page_next': '//a[@class="page-next"]/@href',
-        'image_title': '//div[@class="links"]/a/text()',
-        'images': '//div[@class="listBox"]/div[2]/div/ul/li',
-        'comments': '//div[@class="text"]/text()',
-    }
 
     def parse(self, response):
         item = GqFashionShowItem()
         a_s = response.xpath('//div[@id="js-shows-scroll"]/div[@class="select-cont"]/div[@class="viewport"]/div/div/a')
-        for a in a_s:
-            href = a.xpath('@href').extract_first()
-            item['page_url'] = href
-            request = Request(url=href, callback=self.parse_brand_list)
-            request.meta['item'] = copy.deepcopy(item)
-            yield request
+        for index, a in enumerate(a_s):
+            if index == 0:
+                href = a.xpath('@href').extract_first()
+                item['page_url'] = href
+                request = Request(url=href, callback=self.parse_brand_list)
+                request.meta['item'] = copy.deepcopy(item)
+                yield request
 
 
     def parse_brand_list(self, response):
@@ -61,10 +49,10 @@ class GqSpider(CrawlSpider):
     def parse_fashion_show_detail(self, response):
         item = response.meta['item']
         # 提取标题
-        title = response.xpath(self.x_path['image_title']).extract_first()
+        title = response.xpath('//div[@class="links"]/a/text()').extract_first()
 
         # 提取评论
-        comments = response.xpath(self.x_path['comments']).extract()
+        comments = response.xpath('//div[@class="text"]/text()').extract()
         comment = None
         if comments:
             for comm in comments:

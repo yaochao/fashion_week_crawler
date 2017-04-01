@@ -87,40 +87,6 @@ class AutohomeMongodbPipeline(object):
         return item
 
 
-# Autohome_copy
-class AutohomePipeline(object):
-    def __init__(self):
-        self.client = pymongo.MongoClient(
-            settings['MONGO_HOST'],
-            settings['MONGO_PORT']
-        )
-        self.db = self.client['autohome2']
-        self.config_collection = self.db['config']
-        self.koubei_collection = self.db['koubei']
-        self.purchase_goal_collection = self.db['purchase_goal']
-        self.trouble_rank = self.db['trouble_rank']
-        self.trouble_detail = self.db['trouble_detail']
-
-    def process_item(self, item, spider):
-        try:
-            if item['type'] == 'koubei':
-                self.koubei_collection.insert(dict(item))
-            elif item['type'] == 'purchase_goal':
-                self.purchase_goal_collection.insert(dict(item))
-            elif item['type'] == 'trouble_rank':
-                self.trouble_rank.insert(dict(item))
-            elif item['type'] == 'trouble_detail':
-                self.trouble_detail.insert(dict(item))
-            else:
-                self.config_collection.insert(dict(item))
-        except Exception as e:
-            logger.error(e)
-        return item
-
-    def close_spider(self, spider):
-        self.client.close()
-
-
 # 存储到Mongodb
 class MongodbStorePipeline(object):
     def __init__(self):
@@ -158,6 +124,7 @@ class MongodbStorePipeline(object):
         print('close_spider')
         self.client.close()
 
+
 # 存储到Mongodb - Vogue
 class VogueMongodbStorePipeline(object):
     def __init__(self):
@@ -179,6 +146,7 @@ class VogueMongodbStorePipeline(object):
     def close_spider(self, spider):
         print('close_spider')
         self.client.close()
+
 
 # 检测图片是否存在
 class DuplicatesImagePipeline(object):
@@ -335,3 +303,76 @@ class AutohomeKafkaPipeline(object):
     # 正确的关闭应该是从scrapy的关闭函数进行关闭。
     def close_spider(self, spider):
         self.producer.close()
+
+
+# Autohome_copy Pipeline
+class AutohomePipeline(object):
+    def __init__(self):
+        self.client = pymongo.MongoClient(
+            settings['MONGO_HOST'],
+            settings['MONGO_PORT']
+        )
+        self.db = self.client['autohome_more2']
+        self.config_collection = self.db['config']
+        self.koubei_collection = self.db['koubei']
+        self.purchase_goal_collection = self.db['purchase_goal']
+        self.trouble_rank = self.db['trouble_rank']
+        self.trouble_detail = self.db['trouble_detail']
+
+    def process_item(self, item, spider):
+        try:
+            if item['type'] == 'koubei':
+                self.koubei_collection.insert(dict(item))
+            elif item['type'] == 'purchase_goal':
+                self.purchase_goal_collection.insert(dict(item))
+            elif item['type'] == 'trouble_rank':
+                self.trouble_rank.insert(dict(item))
+            elif item['type'] == 'trouble_detail':
+                self.trouble_detail.insert(dict(item))
+            else:
+                self.config_collection.insert(dict(item))
+        except Exception as e:
+            logger.error(e)
+        return item
+
+    def close_spider(self, spider):
+        self.client.close()
+
+
+# WeiboKafka
+class WeiboSearchKafkaPipeline(object):
+    def __init__(self):
+        self.producer = KafkaProducer(bootstrap_servers=settings['KAFKA_URI'])
+
+    def process_item(self, item, spider):
+        topic = settings['TOPIC_WEIBO']
+        item = dict(item)
+        json_item = json.dumps(item)
+        self.producer.send(topic, json_item)
+        self.producer.flush()
+
+
+# 这里遇到的问题: 一开始从__del__(稀构函数)里面关闭的close,导致的问题,是producer没有写入kafka就关闭了,
+# 正确的关闭应该是从scrapy的关闭函数进行关闭。
+def close_spider(self, spider):
+    self.producer.close()  # Autohome_
+
+
+class WeiboSearchMongodbPipeline(object):
+    def __init__(self):
+        self.client = pymongo.MongoClient(
+            settings['MONGO_HOST'],
+            settings['MONGO_PORT']
+        )
+        self.db = self.client['weibosearch']
+        self.collection = self.db['content']
+
+    def process_item(self, item, spider):
+        try:
+            self.collection.insert(dict(item))
+        except Exception as e:
+            logger.error(e)
+        return item
+
+    def close_spider(self, spider):
+        self.client.close()

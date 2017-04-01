@@ -45,7 +45,7 @@ MONGO_HOST = '127.0.0.1'
 # MONGO_HOST = '192.168.39.26'
 MONGO_PORT = 27017
 MONGO_DB = 'fashionshow'
-MONGO_COLLECTION_VOGUE = 'vogueraw2'
+MONGO_COLLECTION_VOGUE = 'vogue'
 MONGO_COLLECTION_GQ = 'gq'
 MONGO_COLLECTION_NOFASHION = 'nofashion'
 MONGO_COLLECTION_HAIBAO = 'haibao'
@@ -61,6 +61,7 @@ TOPIC_AUTOHOME_KOUBEI = 'autohome_koubei'
 TOPIC_AUTOHOME_PURCHASE_GOAL = 'autohome_purchase_goal'
 TOPIC_AUTOHOME_TROUBLE_RANK = 'autohome_trouble_rank'
 TOPIC_AUTOHOME_TROUBLE_DETAIL = 'autohome_trouble_detail'
+TOPIC_WEIBO = 'weibo_content2'
 
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
@@ -69,7 +70,7 @@ TOPIC_AUTOHOME_TROUBLE_DETAIL = 'autohome_trouble_detail'
 # Configure a delay for requests for the same website (default: 0)
 # See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-# DOWNLOAD_DELAY = 3
+# DOWNLOAD_DELAY =
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 16
 # CONCURRENT_REQUESTS_PER_IP = 16
