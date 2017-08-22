@@ -352,10 +352,10 @@ class WeiboSearchKafkaPipeline(object):
         self.producer.flush()
 
 
-# 这里遇到的问题: 一开始从__del__(稀构函数)里面关闭的close,导致的问题,是producer没有写入kafka就关闭了,
-# 正确的关闭应该是从scrapy的关闭函数进行关闭。
-def close_spider(self, spider):
-    self.producer.close()  # Autohome_
+    # 这里遇到的问题: 一开始从__del__(稀构函数)里面关闭的close,导致的问题,是producer没有写入kafka就关闭了,
+    # 正确的关闭应该是从scrapy的关闭函数进行关闭。
+    def close_spider(self, spider):
+        self.producer.close()  # Autohome_
 
 
 class WeiboSearchMongodbPipeline(object):
